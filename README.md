@@ -1,5 +1,15 @@
 # Claude API Switch
 
+<p align="center">
+  <a href="README.md">
+    <img src="https://img.shields.io/badge/📖-文档-中文-red.svg" alt="中文文档">
+  </a>
+  &nbsp;
+  <a href="README.en.md">
+    <img src="https://img.shields.io/badge/📖-Documentation-English-blue.svg" alt="English Documentation">
+  </a>
+</p>
+
 一个简洁、高效的 Claude CLI API 配置切换工具，专为远程环境和开发者设计。
 
 ## ✨ 特性

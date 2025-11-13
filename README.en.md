@@ -1,5 +1,15 @@
 # Claude API Switch
 
+<p align="center">
+  <a href="README.md">
+    <img src="https://img.shields.io/badge/📖-文档-中文-red.svg" alt="中文文档">
+  </a>
+  &nbsp;
+  <a href="README.en.md">
+    <img src="https://img.shields.io/badge/📖-Documentation-English-blue.svg" alt="English Documentation">
+  </a>
+</p>
+
 A concise, efficient Claude CLI API configuration switching tool designed for remote environments and developers.
 
 ## ✨ Features
@@ -21,8 +31,8 @@ A concise, efficient Claude CLI API configuration switching tool designed for re
 claude-api-switch/
 ├── claude-switch          # Main script file
 ├── install.sh            # Auto-installation script
-├── README.md             # Chinese project documentation
-├── README_EN.md          # English project documentation
+├── README.md             # Chinese project documentation (main)
+├── README.en.md          # English project documentation
 ├── LICENSE               # Open source license
 └── configs/              # Preset configuration files
     ├── glm.json          # GLM (Zhipu AI) configuration
