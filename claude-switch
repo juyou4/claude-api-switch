@@ -210,6 +210,13 @@ list_configs() {
         for config in "$CONFIG_DIR"/*.json; do
             if [ -f "$config" ]; then
                 local name=$(basename "$config" .json)
+
+                # 排除特殊配置类型（与别名生成逻辑保持一致）
+                case "$name" in
+                    zh-ui|en-ui|test-*|*.tmp|*.backup*)
+                        continue
+                        ;;
+                esac
                 local marker=" "
                 if [ "$name" = "$current" ]; then
                     marker="*"
