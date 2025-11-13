@@ -1,0 +1,37 @@
+{
+  "name": "ernie",
+  "display_name": "文心一言",
+  "provider": "baidu",
+  "description": "百度文心一言大模型，需要OAuth2认证",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "your-baidu-access-token-here",
+    "ANTHROPIC_BASE_URL": "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/anthropic",
+    "API_TIMEOUT_MS": "3000000",
+    "BAIDU_CLIENT_ID": "your-baidu-client-id-here",
+    "BAIDU_CLIENT_SECRET": "your-baidu-client-secret-here",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "ernie-4.0-8k",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "ernie-4.0-8k",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "ernie-3.5-8k"
+  },
+  "models": {
+    "ernie-4.0-8k": "文心4.0-8K - 最新4.0模型8K上下文",
+    "ernie-4.0-128k": "文心4.0-128K - 最新4.0模型128K上下文",
+    "ernie-3.5-8k": "文心3.5-8K - 3.5版本8K上下文",
+    "ernie-3.5-128k": "文心3.5-128K - 3.5版本128K上下文",
+    "ernie-speed-8k": "文心-Speed-8K - 高速推理8K上下文",
+    "ernie-speed-128k": "文心-Speed-128K - 高速推理128K上下文",
+    "ernie-tiny-8k": "文心-Tiny-8K - 轻量级8K上下文"
+  },
+  "default_model": "ernie-4.0-8k",
+  "metadata": {
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "version": "1.0",
+    "note": "需要OAuth2认证流程，使用Client ID和Secret获取Access Token",
+    "website": "https://cloud.baidu.com/product/wenxinworkshop",
+    "pricing": "输入: ¥0.012-0.12/千tokens, 输出: ¥0.036-0.36/千tokens",
+    "limits": "请求频率: 100-300次/分钟, 最大上下文: 8K-128K tokens",
+    "auth_flow": "OAuth2 Client Credentials Grant",
+    "token_refresh": "Access Token有效期为30天，需要定期刷新"
+  }
+}

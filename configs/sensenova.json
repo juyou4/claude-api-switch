@@ -1,0 +1,30 @@
+{
+  "name": "sensenova",
+  "display_name": "商汤SenseNova",
+  "provider": "sensetime",
+  "description": "商汤SenseNova大模型，基本兼容Claude格式",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "your-sensenova-api-key-here",
+    "ANTHROPIC_BASE_URL": "https://api.sensenova.cn/v1/anthropic",
+    "API_TIMEOUT_MS": "3000000",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "SenseChat-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "SenseChat-5",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "SenseChat-3"
+  },
+  "models": {
+    "SenseChat-5": "SenseChat-5 - 商汤最新5代模型，强大推理能力",
+    "SenseChat-3": "SenseChat-3 - 商汤3代模型，稳定可靠",
+    "SenseChat-Turbo": "SenseChat-Turbo - 高速推理版本",
+    "SenseChat-Lite": "SenseChat-Lite - 轻量级版本"
+  },
+  "default_model": "SenseChat-5",
+  "metadata": {
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "version": "1.0",
+    "note": "商汤日日新大模型平台，需要申请API Key",
+    "website": "https://platform.sensenova.cn/",
+    "pricing": "输入: ¥0.02-0.1/千tokens, 输出: ¥0.06-0.3/千tokens",
+    "limits": "请求频率: 100-200次/分钟, 最大上下文: 32K tokens"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "doubao",
+  "display_name": "豆包",
+  "provider": "bytedance",
+  "description": "字节跳动豆包编程专用模型，原生兼容Claude格式",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "your-doubao-api-key-here",
+    "ANTHROPIC_BASE_URL": "https://ark.cn-beijing.volces.com/api/v3/anthropic",
+    "API_TIMEOUT_MS": "3000000",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "Doubao-Seed-Code",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "Doubao-Seed-Code",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "Doubao-Seed-Code"
+  },
+  "models": {
+    "Doubao-Seed-Code": "豆包编程专用模型 - 专为代码生成优化"
+  },
+  "default_model": "Doubao-Seed-Code",
+  "metadata": {
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "version": "1.0",
+    "note": "编程专用模型，9.9元/月，无需Endpoint ID配置",
+    "website": "https://www.volcengine.com/product/ark",
+    "pricing": "¥9.9元/月套餐",
+    "limits": "请求频率: 无限制, 原生Claude API兼容",
+    "special_feature": "迁移成本几乎为零，支持veCLI直接使用"
+  }
+}

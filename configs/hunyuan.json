@@ -1,0 +1,32 @@
+{
+  "name": "hunyuan",
+  "display_name": "腾讯混元",
+  "provider": "tencent",
+  "description": "腾讯混元大模型，需要TC3签名认证",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "your-tencent-secret-id-here",
+    "ANTHROPIC_BASE_URL": "https://hunyuan.tencentcloudapi.com/anthropic",
+    "API_TIMEOUT_MS": "3000000",
+    "TENCENT_SECRET_KEY": "your-tencent-secret-key-here",
+    "TENCENT_REGION": "ap-beijing",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "hunyuan-standard",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "hunyuan-standard",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "hunyuan-lite"
+  },
+  "models": {
+    "hunyuan-standard": "混元-standard - 标准版模型，均衡性能",
+    "hunyuan-lite": "混元-lite - 轻量版模型，快速响应",
+    "hunyuan-pro": "混元-pro - 专业版模型，顶级能力"
+  },
+  "default_model": "hunyuan-standard",
+  "metadata": {
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "version": "1.0",
+    "note": "需要配置腾讯云SecretId和SecretKey，使用TC3签名认证",
+    "website": "https://cloud.tencent.com/product/hunyuan",
+    "pricing": "输入: ¥0.018-0.12/千tokens, 输出: ¥0.054-0.36/千tokens",
+    "limits": "请求频率: 5-20次/秒, 最大上下文: 32K tokens",
+    "auth_required": "腾讯云API密钥 + TC3签名"
+  }
+}

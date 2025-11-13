@@ -1,0 +1,29 @@
+{
+  "name": "minimax",
+  "display_name": "MiniMax",
+  "provider": "minimax",
+  "description": "MiniMax M2.1高性能编程模型",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "your-minimax-token-here",
+    "ANTHROPIC_BASE_URL": "https://api.minimaxi.com/anthropic",
+    "API_TIMEOUT_MS": "6000000",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "MiniMax-M2",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "MiniMax-M2",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "MiniMax-M2"
+  },
+  "models": {
+    "MiniMax-M2": "MiniMax M2.1 - 高性能编程模型，处理复杂任务专用"
+  },
+  "default_model": "MiniMax-M2",
+  "metadata": {
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "version": "1.0",
+    "note": "官方限时免费，超时设置为6000秒以处理复杂任务",
+    "website": "https://platform.minimaxi.com/user-center/basic-information/interface-key",
+    "pricing": "官方限时免费 - 8%价格打出Claude级性能",
+    "limits": "每分钟20请求数，每分钟处理百万token数量",
+    "timeout_reason": "M2处理复杂任务可能需要更长时间，设置为100分钟",
+    "performance": "响应速度约为原来的2倍"
+  }
+}

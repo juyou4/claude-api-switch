@@ -1,0 +1,32 @@
+{
+  "name": "kimi-global",
+  "display_name": "Kimi Global",
+  "provider": "moonshot",
+  "description": "月之暗面Kimi编程模型 - 国际用户专用",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "your-kimi-global-api-key-here",
+    "ANTHROPIC_BASE_URL": "https://api.moonshot.ai/anthropic",
+    "API_TIMEOUT_MS": "6000000",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "kimi-for-coding",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "kimi-for-coding",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "kimi-for-coding"
+  },
+  "models": {
+    "kimi-for-coding": "编程专用模型 - 代码生成优化",
+    "moonshot-v1-8k": "通用8K上下文模型",
+    "moonshot-v1-32k": "长上下文32K模型",
+    "moonshot-v1-128k": "超长上下文128K模型"
+  },
+  "default_model": "kimi-for-coding",
+  "metadata": {
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "version": "1.0",
+    "note": "国际用户专用，API Key必须从moonshot.ai获取",
+    "website": "https://platform.moonshot.ai/",
+    "pricing": "Input: $0.015/千tokens, Output: $0.06/千tokens",
+    "limits": "请求频率: 100次/分钟, 最大上下文: 128K tokens",
+    "region": "国际",
+    "endpoint": "https://api.moonshot.ai/anthropic"
+  }
+}

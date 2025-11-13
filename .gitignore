@@ -1,0 +1,57 @@
+# Claude API Switch - Git Ignore File
+# 保护用户敏感信息不被意外提交
+
+# 用户配置文件（包含API密钥）
+configs/config*.json
+configs/test*.json
+configs/user-*.json
+configs/*-backup.json
+
+# Claude CLI用户数据和配置
+.claude/settings.json
+.claude/backups/
+.claude/logs/
+
+# 敏感信息和凭证
+*.key
+*.pem
+*.crt
+*.p12
+.env
+.env.*
+*.token
+*.secret
+
+# 临时文件和缓存
+*.log
+*.tmp
+*.bak
+*.cache
+*.pid
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.idea/
+
+# 编辑器和IDE文件
+*.orig
+*.rej
+*~
+
+# 测试和开发文件
+test-*
+debug-*
+dev-*
+
+# 个人配置文件
+personal-*
+private-*
+
+# 自动生成的文件
+auto-*
+generated-*

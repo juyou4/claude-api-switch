@@ -1,0 +1,32 @@
+{
+  "name": "deepseek",
+  "display_name": "DeepSeek",
+  "provider": "deepseek",
+  "description": "DeepSeek的深度求索API，完全兼容Claude格式",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "your-deepseek-api-key-here",
+    "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
+    "API_TIMEOUT_MS": "3000000",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-chat",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "deepseek-chat",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-coder"
+  },
+  "models": {
+    "deepseek-chat": "DeepSeek Chat - 通用对话模型，适合各种任务",
+    "deepseek-chat-v3.1": "DeepSeek Chat V3.1 - 最新版本，增强Claude API支持",
+    "deepseek-coder": "DeepSeek Coder - 专业编程模型，代码生成和优化",
+    "deepseek-reasoner": "DeepSeek Reasoner - 推理专用模型"
+  },
+  "default_model": "deepseek-chat-v3.1",
+  "metadata": {
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "version": "1.0",
+    "note": "V3.1版本增加了对Anthropic API格式的支持，完全兼容",
+    "website": "https://platform.deepseek.com/",
+    "api_docs": "https://api-docs.deepseek.com/zh-cn/guides/anthropic_api",
+    "pricing": "输入: ¥0.14/千tokens, 输出: ¥0.28/千tokens",
+    "limits": "请求频率: 120次/分钟, 最大上下文: 128K tokens",
+    "special_feature": "性价比极高，代码生成能力强"
+  }
+}

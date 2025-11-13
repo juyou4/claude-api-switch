@@ -1,0 +1,29 @@
+{
+  "name": "qwen",
+  "display_name": "通义千问",
+  "provider": "alibaba",
+  "description": "阿里云通义千问Claude Code专用配置",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "sk-your-qwen-api-key-here",
+    "ANTHROPIC_BASE_URL": "https://dashscope.aliyuncs.com/api/v2/apps/claude-code-proxy",
+    "API_TIMEOUT_MS": "3000000",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "qwen3-coder-plus",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "qwen3-coder-plus",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "qwen3-coder-plus"
+  },
+  "models": {
+    "qwen3-coder-plus": "通义千问3编程增强版 - Claude Code专用模型"
+  },
+  "default_model": "qwen3-coder-plus",
+  "metadata": {
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "version": "1.0",
+    "note": "仅支持qwen3-coder-plus模型，其他模型暂不支持Claude Code",
+    "website": "https://bailian.console.aliyun.com/",
+    "pricing": "每天2000次免费API调用（魔搭社区）",
+    "limits": "请求频率: 根据套餐限制, 仅支持qwen3-coder-plus",
+    "model_restriction": "当前仅支持qwen3-coder-plus，无法通过环境变量修改",
+    "free_tier": "魔搭社区提供每天2000次免费调用，需绑定阿里云账号"
+  }
+}

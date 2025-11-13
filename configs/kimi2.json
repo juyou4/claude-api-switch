@@ -1,0 +1,26 @@
+{
+  "name": "kimi2",
+  "display_name": "Kimi2 Coding",
+  "provider": "moonshot",
+  "description": "月之暗面的Kimi2编程专用模型",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "sk-kimi-JUKVYBFJSDJNpc7voelYyrLCsqxk6SxnH8R6rXqiLGgB6HTFKeeB5cP9K9dUq77B",
+    "ANTHROPIC_BASE_URL": "https://api.kimi.com/coding/",
+    "API_TIMEOUT_MS": "6000000",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "kimi-for-coding",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "kimi-for-coding",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "kimi-for-coding"
+  },
+  "models": {
+    "kimi-for-coding": "编程专用模型 - 代码生成优化",
+    "moonshot-v1-8k": "通用8K上下文模型",
+    "moonshot-v1-32k": "长上下文32K模型",
+    "moonshot-v1-128k": "超长上下文128K模型"
+  },
+  "default_model": "kimi-for-coding",
+  "metadata": {
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z",
+    "version": "1.0"
+  }
+}
