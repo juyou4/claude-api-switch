@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 
 # 配置路径
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_DIR="$SCRIPT_DIR/configs"
+CONFIG_DIR="$HOME/.claude/configs"
 CLAUDE_CONFIG="$HOME/.claude/settings.json"
 BACKUP_DIR="$HOME/.claude/backups"
 ACTIVE_MARKER="$HOME/.claude/.active_config"
@@ -331,16 +331,16 @@ apply_config_with_env_overrides() {
         # 使用jq处理环境变量覆盖
         jq '
             .env |= with_entries(
-                if .key == "ANTHROPIC_AUTH_TOKEN" and ($ENV.ANTHROPIC_AUTH_TOKEN | length) > 0 then
-                    .value = $ENV.ANTHROPIC_AUTH_TOKEN
-                elif .key == "ANTHROPIC_BASE_URL" and ($ENV.ANTHROPIC_BASE_URL | length) > 0 then
-                    .value = $ENV.ANTHROPIC_BASE_URL
-                elif .key == "ANTHROPIC_DEFAULT_OPUS_MODEL" and ($ENV.ANTHROPIC_DEFAULT_OPUS_MODEL | length) > 0 then
-                    .value = $ENV.ANTHROPIC_DEFAULT_OPUS_MODEL
-                elif .key == "ANTHROPIC_DEFAULT_SONNET_MODEL" and ($ENV.ANTHROPIC_DEFAULT_SONNET_MODEL | length) > 0 then
-                    .value = $ENV.ANTHROPIC_DEFAULT_SONNET_MODEL
-                elif .key == "ANTHROPIC_DEFAULT_HAIKU_MODEL" and ($ENV.ANTHROPIC_DEFAULT_HAIKU_MODEL | length) > 0 then
-                    .value = $ENV.ANTHROPIC_DEFAULT_HAIKU_MODEL
+                if .key == "ANTHROPIC_AUTH_TOKEN" and ($ENV_ANTHROPIC_AUTH_TOKEN | length) > 0 then
+                    .value = $ENV_ANTHROPIC_AUTH_TOKEN
+                elif .key == "ANTHROPIC_BASE_URL" and ($ENV_ANTHROPIC_BASE_URL | length) > 0 then
+                    .value = $ENV_ANTHROPIC_BASE_URL
+                elif .key == "ANTHROPIC_DEFAULT_OPUS_MODEL" and ($ENV_ANTHROPIC_DEFAULT_OPUS_MODEL | length) > 0 then
+                    .value = $ENV_ANTHROPIC_DEFAULT_OPUS_MODEL
+                elif .key == "ANTHROPIC_DEFAULT_SONNET_MODEL" and ($ENV_ANTHROPIC_DEFAULT_SONNET_MODEL | length) > 0 then
+                    .value = $ENV_ANTHROPIC_DEFAULT_SONNET_MODEL
+                elif .key == "ANTHROPIC_DEFAULT_HAIKU_MODEL" and ($ENV_ANTHROPIC_DEFAULT_HAIKU_MODEL | length) > 0 then
+                    .value = $ENV_ANTHROPIC_DEFAULT_HAIKU_MODEL
                 else
                     .
                 end

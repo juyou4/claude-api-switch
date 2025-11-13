@@ -242,6 +242,7 @@ csbackup
 - **Models**: hunyuan-standard, hunyuan-lite, hunyuan-pro
 - **Configuration File**: `configs/hunyuan.json`
 - **Features**: Requires Tencent Cloud API key and TC3 signature
+- **⚠️ Note**: Tencent Hunyuan currently does not officially support Claude Code's Anthropic API interface. Requires Claude Code Router as intermediate layer or third-party API forwarding service
 
 #### 7. Doubao (ByteDance)
 - **API Endpoint**: `https://ark.cn-beijing.volces.com/api/v3/anthropic`
@@ -260,12 +261,14 @@ csbackup
 - **Models**: ernie-4.0-8k/128k, ernie-3.5-8k/128k, ernie-speed-8k/128k
 - **Configuration File**: `configs/ernie.json`
 - **Features**: Requires OAuth2 authentication process
+- **⚠️ Note**: Ernie currently does not officially support Claude Code's Anthropic API interface. Solution similar to Tencent Hunyuan, requires Claude Code Router as intermediate layer or third-party API forwarding service
 
 #### 10. SenseNova (SenseTime)
 - **API Endpoint**: `https://api.sensenova.cn/v1/anthropic`
 - **Models**: SenseChat-5, SenseChat-3, SenseChat-Turbo, SenseChat-Lite
 - **Configuration File**: `configs/sensenova.json`
 - **Features**: SenseTime Daily New Model Platform
+- **⚠️ Note**: SenseNova primarily provides API migration services rather than direct configuration. Specific API configuration requires consultation with SenseTime official support for detailed BASE_URL and configuration information
 
 #### 11. Claude Official (Anthropic)
 - **API Endpoint**: `https://api.anthropic.com`

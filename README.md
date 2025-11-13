@@ -239,6 +239,7 @@ csbackup
 - **模型**: hunyuan-standard, hunyuan-lite, hunyuan-pro
 - **配置文件**: `configs/hunyuan.json`
 - **特点**: 需要腾讯云API密钥和TC3签名
+- **⚠️ 注意**: 腾讯混元目前没有官方直接支持Claude Code的Anthropic API接口，需要通过Claude Code Router作为中转层或使用第三方API中转站
 
 #### 7. 豆包 (字节跳动)
 - **API端点**: `https://ark.cn-beijing.volces.com/api/v3/anthropic`
@@ -257,12 +258,14 @@ csbackup
 - **模型**: ernie-4.0-8k/128k, ernie-3.5-8k/128k, ernie-speed-8k/128k
 - **配置文件**: `configs/ernie.json`
 - **特点**: 需要OAuth2认证流程
+- **⚠️ 注意**: 文心一言目前没有官方直接支持Claude Code的Anthropic API接口，解决方案与腾讯混元类似，需要通过Claude Code Router作为中转层或使用第三方API中转站
 
 #### 9. 商汤SenseNova
 - **API端点**: `https://api.sensenova.cn/v1/anthropic`
 - **模型**: SenseChat-5, SenseChat-3, SenseChat-Turbo, SenseChat-Lite
 - **配置文件**: `configs/sensenova.json`
 - **特点**: 商汤日日新大模型平台
+- **⚠️ 注意**: 商汤主要提供API迁移服务，而非直接配置。具体API配置需咨询商汤官方获取详细的BASE_URL和配置信息
 
 #### 10. Claude Official (Anthropic)
 - **API端点**: `https://api.anthropic.com`

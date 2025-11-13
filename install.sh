@@ -204,7 +204,10 @@ csbackup() {
 csrefresh() {
     echo "🔄 正在刷新配置别名..."
     # 重新生成配置别名
-    unalias -a "cs*" 2>/dev/null || true
+    # 安全删除cs开头的别名
+    for alias_name in $(alias 2>/dev/null | grep "^cs" | cut -d'=' -f1); do
+        unalias "$alias_name" 2>/dev/null || true
+    done
 
     # 重新添加基础别名
     alias cs='claude-switch'
