@@ -65,8 +65,16 @@ validate_config_completeness() {
     local auth_token=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // ""' "$config_file")
     local base_url=$(jq -r '.env.ANTHROPIC_BASE_URL // ""' "$config_file")
     local model=$(jq -r '.env.ANTHROPIC_DEFAULT_SONNET_MODEL // ""' "$config_file")
+    local provider=$(jq -r '.provider // ""' "$config_file")
 
-    # 检查API密钥
+    # 语言界面配置特殊处理：跳过API密钥验证
+    if [ "$provider" = "language-ui" ]; then
+        echo -e "${GREEN}✅ 语言界面配置验证通过${NC}"
+        echo -e "${CYAN}ℹ️ 语言配置使用环境变量中的API密钥${NC}"
+        return 0
+    fi
+
+    # 检查API密钥（仅对API提供商配置）
     if [ -z "$auth_token" ] || [ "$auth_token" = "your-api-key-here" ] || [ "$auth_token" = "sk-your-api-key-here" ]; then
         errors+=("❌ API密钥未配置或为占位符")
     fi
