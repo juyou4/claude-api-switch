@@ -147,12 +147,39 @@ install_shell_integration() {
 # Claude API Switch 集成
 export PATH="$HOME/.local/bin:$PATH"
 
-# Claude Switch 基础别名
-alias cs='claude-switch'
-alias cslist='claude-switch list'
-alias csstatus='claude-switch status'
+# Claude Switch 基础函数（语言感知）
+cs() {
+    if [ $# -eq 0 ]; then
+        # 无参数时显示交互菜单，会根据当前语言显示对应界面
+        claude-switch
+    else
+        # 有参数时传递给claude-switch
+        claude-switch "$@"
+    fi
+}
 
-# 动态生成提供商别名（在下次Shell启动时生效）
+cslist() {
+    claude-switch list
+}
+
+csstatus() {
+    claude-switch status
+}
+
+# 语言切换函数
+cscn() {
+    claude-switch zh-ui
+}
+
+csen() {
+    claude-switch en-ui
+}
+
+cslang() {
+    claude-switch list | grep -E "(zh-ui|en-ui)"
+}
+
+# 动态生成提供商别名函数
 cs_generate_aliases() {
     if [ -d "$HOME/.claude/configs" ]; then
         echo "# 动态生成的配置别名"
@@ -165,19 +192,17 @@ cs_generate_aliases() {
                         continue
                         ;;
                 esac
-                echo "alias cs${config_name}='claude-switch ${config_name}'"
+                echo "cs${config_name}() { claude-switch ${config_name}; }"
             fi
         done
     fi
 }
 
-# 调用函数生成别名
+# 调用函数生成别名函数
 eval "$(cs_generate_aliases)"
 
-# 语言切换别名
-alias cscn='claude-switch zh-ui'
-alias csen='claude-switch en-ui'
-alias cslang='claude-switch list | grep -E "(zh-ui|en-ui)"'
+# 向后兼容的别名（可选）
+alias cs='cs' 2>/dev/null || true
 
 # Claude Switch 函数
 cscreate() {

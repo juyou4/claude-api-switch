@@ -1078,11 +1078,11 @@ interactive_menu() {
                 echo ""
                 case $REPLY in
                     1)
-                        switch_config "zh-ui"
+                        switch_language_to "zh-CN"
                         read -p "$(get_text "menu.press_enter_continue")"
                         ;;
                     2)
-                        switch_config "en-ui"
+                        switch_language_to "en-US"
                         read -p "$(get_text "menu.press_enter_continue")"
                         ;;
                     3)
