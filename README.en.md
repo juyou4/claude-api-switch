@@ -24,6 +24,9 @@ A concise, efficient Claude CLI API configuration switching tool designed for re
 - 🎨 **Interactive Creation** - Graphical configuration creation wizard
 - 🔍 **Smart Validation** - API endpoint and configuration integrity checking
 - 💾 **Auto Backup** - Automatic backup protection before configuration changes
+- 🔐 **Smart Key Management** - Quick setup and batch management of API keys
+- 🛡️ **Key Security Validation** - Format validation and automatic backup protection
+- 🌐 **Multilingual Interaction** - Complete Chinese and English interactive wizards
 
 ## 🏗️ Project Structure
 
@@ -98,6 +101,11 @@ claude-switch en-ui            # Switch to English interface
 
 # Display current configuration status
 claude-switch status
+
+# Key Management
+claude-switch set-key glm "your-api-key-here"    # Quick setup GLM API key
+claude-switch set-key deepseek "your-api-key-here" # Quick setup DeepSeek API key
+claude-switch setup-keys                            # Batch setup all configurations' API keys
 
 # Advanced configuration management
 claude-switch create            # Launch interactive configuration creation wizard
@@ -178,6 +186,10 @@ csstatus              # Display current status
 cscn                  # Switch to Chinese interface
 csen                  # Switch to English interface
 cslang                # List language configurations
+
+# Key management aliases
+cskey <name> <key>     # Quick setup API key
+cskeys                # Batch setup all keys
 ```
 
 ### Configuration Management Commands
@@ -203,6 +215,92 @@ csdelete old-config
 
 # Regular configuration backup
 csbackup
+```
+
+## 🔐 Key Management
+
+### Quick Setup Single API Key
+
+Use the `set-key` command to quickly set an API key for a specific configuration:
+
+```bash
+# Basic usage
+claude-switch set-key <config_name> <api_key>
+
+# Examples
+claude-switch set-key glm "your-glm-api-key-here"
+claude-switch set-key deepseek "your-deepseek-api-key-here"
+claude-switch set-key kimi2 "your-kimi2-api-key-here"
+```
+
+**Features**:
+- ✅ Automatic key format validation (minimum 20 characters)
+- ✅ Automatic backup of original configuration files
+- ✅ JSON format validation and error handling
+- ✅ Support for both jq and sed update methods
+- ✅ Complete multilingual support
+
+### Batch Setup All API Keys
+
+Use the `setup-keys` command to launch interactive batch setup wizard:
+
+```bash
+claude-switch setup-keys
+```
+
+**Wizard Features**:
+- 🔍 Intelligent detection of configurations needing keys
+- ⏭️  Skip configurations with existing valid keys
+- 🔒 Secure key input (hidden display)
+- ✅ Confirmation mechanism (y confirm/n skip/r re-enter/q quit)
+- 📊 Real-time setup progress and results
+
+**Interaction Flow**:
+1. Automatically scan all configuration files
+2. Identify configurations needing key setup or updates
+3. Guide user through API key input for each configuration
+4. Display key preview and request confirmation
+5. Apply settings and provide feedback
+
+### Security Features
+
+#### Automatic Backup Protection
+- Automatic configuration file backup before each modification
+- Backup file naming: `config.json.backup.YYYYMMDD_HHMMSS`
+- Automatic backup recovery on operation failure
+
+#### Key Format Validation
+- Basic length validation (≥20 characters)
+- JSON format integrity check
+- Configuration file structure validation
+
+#### Error Handling and Recovery
+- Detailed error messages and solution suggestions
+- Automatic rollback on operation failure
+- Fallback solutions for permission issues
+
+### Best Practices
+
+1. **Regular Backups**: Use `claude-switch backup` for regular configuration backups
+2. **Key Security**: Avoid exposing API keys in command history, use interactive wizard
+3. **Step-by-Step Setup**: Use `setup-keys` wizard for batch setup
+4. **Validation Testing**: Use `claude-switch status` to verify configurations after setup
+5. **Version Control**: Do not commit configuration files containing real API keys to version control
+
+### Key Management Examples
+
+```bash
+# 1. Set key for GLM
+claude-switch set-key glm "sk-your-glm-key-xxxxxxxx"
+
+# 2. Batch setup all configurations' keys
+claude-switch setup-keys
+
+# 3. Verify setup results
+claude-switch status
+
+# 4. Backup configuration (for safety)
+claude-switch backup
 ```
 
 ## 🔧 Configuration Guide
@@ -549,7 +647,15 @@ rm -rf ~/.claude/configs/
 
 ## 📝 Changelog
 
-### v2.0.0 (Latest)
+### v2.1.0 (Latest)
+- ✨ **New set-key Command** - Quick setup of individual API keys with format validation and automatic backup
+- ✨ **New setup-keys Command** - Interactive batch setup wizard for all configurations' API keys
+- 🔐 **Enhanced Key Security Validation** - Key format checking, automatic backup and error recovery mechanisms
+- 🌐 **Complete Multilingual Support** - Full Chinese and English internationalization for key management interface
+- 🛡️ **Optimized Error Handling** - Detailed error messages and automatic rollback functionality
+- 💾 **Improved Backup Mechanism** - Automatic backup protection before configuration modifications
+
+### v2.0.0
 - ✨ **New Interactive Configuration Creation Wizard** - Supports template, current configuration, and custom creation methods
 - 🌍 **Environment Variable Override Mechanism** - Supports dynamic override of configuration parameters with priority higher than configuration files
 - 🔍 **Smart Configuration Validation** - Automatically validates API endpoint format, model names, and configuration integrity

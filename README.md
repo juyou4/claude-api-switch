@@ -24,6 +24,9 @@
 - 🎨 **交互式创建** - 图形化配置创建向导
 - 🔍 **智能验证** - API端点和配置完整性检查
 - 💾 **自动备份** - 配置修改前自动备份保护
+- 🔐 **智能密钥管理** - 快速设置和批量管理API密钥
+- 🛡️ **密钥安全验证** - 格式验证和自动备份保护
+- 🌐 **多语言交互** - 完整的中英文交互式向导
 
 ## 🏗️ 项目结构
 
@@ -95,6 +98,11 @@ claude-switch en-ui            # 切换到英文界面
 
 # 显示当前配置状态
 claude-switch status
+
+# 密钥管理
+claude-switch set-key glm "your-api-key-here"    # 快速设置GLM的API密钥
+claude-switch set-key deepseek "your-api-key-here" # 快速设置DeepSeek的API密钥
+claude-switch setup-keys                            # 批量设置所有配置的API密钥
 
 # 高级配置管理
 claude-switch create            # 启动交互式配置创建向导
@@ -175,6 +183,10 @@ csstatus              # 显示当前状态
 cscn                  # 切换到中文界面
 csen                  # 切换到英文界面
 cslang                # 列出语言配置
+
+# 密钥管理别名
+cskey <名称> <密钥>     # 快速设置API密钥
+cskeys                # 批量设置所有密钥
 ```
 
 ### 配置管理命令
@@ -200,6 +212,92 @@ csdelete old-config
 
 # 定期备份配置
 csbackup
+```
+
+## 🔐 密钥管理
+
+### 快速设置单个API密钥
+
+使用 `set-key` 命令快速为特定配置设置API密钥：
+
+```bash
+# 基本用法
+claude-switch set-key <配置名> <API密钥>
+
+# 示例
+claude-switch set-key glm "your-glm-api-key-here"
+claude-switch set-key deepseek "your-deepseek-api-key-here"
+claude-switch set-key kimi2 "your-kimi2-api-key-here"
+```
+
+**特性**：
+- ✅ 自动验证密钥格式（最小长度20字符）
+- ✅ 自动备份原配置文件
+- ✅ JSON格式验证和错误处理
+- ✅ 支持jq和sed两种更新方式
+- ✅ 完整的多语言支持
+
+### 批量设置所有API密钥
+
+使用 `setup-keys` 命令启动交互式批量设置向导：
+
+```bash
+claude-switch setup-keys
+```
+
+**向导特性**：
+- 🔍 智能检测需要设置密钥的配置
+- ⏭️  跳过已有有效密钥的配置
+- 🔒 安全的密钥输入（隐藏显示）
+- ✅ 确认机制（y确认/n跳过/r重新输入/q退出）
+- 📊 实时显示设置进度和结果
+
+**交互流程**：
+1. 自动扫描所有配置文件
+2. 识别需要设置或更新密钥的配置
+3. 逐个引导用户输入API密钥
+4. 显示密钥预览并要求确认
+5. 应用设置并提供反馈
+
+### 安全特性
+
+#### 自动备份保护
+- 每次修改前自动创建配置文件备份
+- 备份文件命名：`config.json.backup.YYYYMMDD_HHMMSS`
+- 操作失败时自动恢复备份
+
+#### 密钥格式验证
+- 基础长度验证（≥20字符）
+- JSON格式完整性检查
+- 配置文件结构验证
+
+#### 错误处理和恢复
+- 详细的错误信息和解决建议
+- 操作失败时自动回滚
+- 权限问题的备用解决方案
+
+### 最佳实践
+
+1. **定期备份**：使用 `claude-switch backup` 定期备份配置
+2. **密钥安全**：避免在命令历史中暴露API密钥，建议使用交互式向导
+3. **分步设置**：建议使用 `setup-keys` 向导进行批量设置
+4. **验证测试**：设置后使用 `claude-switch status` 验证配置
+5. **版本控制**：不要将包含真实API密钥的配置文件提交到版本控制
+
+### 密钥管理示例
+
+```bash
+# 1. 为GLM设置密钥
+claude-switch set-key glm "sk-your-glm-key-xxxxxxxx"
+
+# 2. 批量设置所有配置的密钥
+claude-switch setup-keys
+
+# 3. 验证设置结果
+claude-switch status
+
+# 4. 备份配置（安全起见）
+claude-switch backup
 ```
 
 ## 🔧 配置说明
@@ -546,7 +644,15 @@ rm -rf ~/.claude/configs/
 
 ## 📝 更新日志
 
-### v2.0.0 (最新)
+### v2.1.0 (最新)
+- ✨ **新增set-key命令** - 快速设置单个API密钥，支持格式验证和自动备份
+- ✨ **新增setup-keys命令** - 交互式批量设置所有配置的API密钥向导
+- 🔐 **增强密钥安全验证** - 密钥格式检查、自动备份和错误恢复机制
+- 🌐 **完善多语言支持** - 密钥管理界面的完整中英文国际化
+- 🛡️ **优化错误处理** - 详细的错误信息和自动回滚功能
+- 💾 **改进备份机制** - 配置修改前的自动备份保护
+
+### v2.0.0
 - ✨ **新增交互式配置创建向导** - 支持模板、当前配置和自定义三种创建方式
 - 🌍 **环境变量覆盖机制** - 支持动态覆盖配置参数，优先级高于配置文件
 - 🔍 **智能配置验证** - 自动验证API端点格式、模型名称和配置完整性
