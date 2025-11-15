@@ -12,6 +12,46 @@
 
 一个简洁、高效的 Claude CLI API 配置切换工具，专为远程环境和开发者设计。
 
+## 📖 目录
+
+- [✨ 特性](#-特性)
+- [🏗️ 项目结构](#️-项目结构)
+- [🚀 快速开始](#-快速开始)
+  - [安装](#安装)
+  - [基本使用](#基本使用)
+- [🎨 高级功能](#-高级功能)
+  - [交互式配置创建](#交互式配置创建)
+  - [环境变量覆盖](#环境变量覆盖)
+  - [智能配置验证](#智能配置验证)
+  - [自动备份保护](#自动备份保护)
+- [📋 快捷别名](#-快捷别名)
+- [🔐 密钥管理](#-密钥管理)
+  - [快速设置单个API密钥](#快速设置单个api密钥)
+  - [批量设置所有API密钥](#批量设置所有api密钥)
+  - [安全特性](#安全特性)
+  - [最佳实践](#最佳实践)
+- [🔧 配置说明](#-配置说明)
+  - [支持的API提供商](#支持的api提供商)
+  - [UI语言配置](#ui语言配置)
+  - [配置API密钥](#配置api密钥)
+  - [配置文件格式](#配置文件格式)
+- [🎯 使用场景](#-使用场景)
+- [🛠️ 使用指南](#️-使用指南)
+  - [交互式菜单](#交互式菜单)
+  - [配置验证](#配置验证)
+  - [错误处理](#错误处理)
+- [🔧 自定义配置](#-自定义配置)
+  - [添加新的API提供商](#添加新的api提供商)
+  - [环境变量覆盖](#环境变量覆盖-1)
+- [📁 文件位置](#-文件位置)
+- [🔄 卸载](#-卸载)
+- [🐛 故障排除](#-故障排除)
+  - [常见问题](#常见问题)
+  - [调试技巧](#调试技巧)
+- [📝 更新日志](#-更新日志)
+- [📄 许可证](#-许可证)
+- [🤝 贡献](#-贡献)
+
 ## ✨ 特性
 
 - 🚀 **快速切换** - 一键切换多个 Claude API 提供商
@@ -351,27 +391,27 @@ claude-switch backup
 - **模型**: kimi-for-coding, moonshot-v1-8k/32k/128k
 - **特点**: API Key区分中国/国际站点，不兼容
 
-#### 8. 文心一言 (百度)
+#### 9. 文心一言 (百度)
 - **API端点**: `https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/anthropic`
 - **模型**: ernie-4.0-8k/128k, ernie-3.5-8k/128k, ernie-speed-8k/128k
 - **配置文件**: `configs/ernie.json`
 - **特点**: 需要OAuth2认证流程
 - **⚠️ 注意**: 文心一言目前没有官方直接支持Claude Code的Anthropic API接口，解决方案与腾讯混元类似，需要通过Claude Code Router作为中转层或使用第三方API中转站
 
-#### 9. 商汤SenseNova
+#### 10. 商汤SenseNova
 - **API端点**: `https://api.sensenova.cn/v1/anthropic`
 - **模型**: SenseChat-5, SenseChat-3, SenseChat-Turbo, SenseChat-Lite
 - **配置文件**: `configs/sensenova.json`
 - **特点**: 商汤日日新大模型平台
 - **⚠️ 注意**: 商汤主要提供API迁移服务，而非直接配置。具体API配置需咨询商汤官方获取详细的BASE_URL和配置信息
 
-#### 10. Claude Official (Anthropic)
+#### 11. Claude Official (Anthropic)
 - **API端点**: `https://api.anthropic.com`
 - **模型**: claude-3-5-sonnet-20241022, claude-3-opus, claude-3-haiku
 - **配置文件**: `configs/anthropic-official.json`
 - **特点**: 官方API，最高质量保证
 
-### 11. UI语言配置
+### 12. UI语言配置
 
 #### 中文界面 (zh-ui)
 - **配置文件**: `configs/zh-ui.json`
@@ -463,7 +503,7 @@ cscreate work-project
 claude-switch work-project
 ```
 
-## 🛠️ 高级功能
+## 🛠️ 使用指南
 
 ### 交互式菜单
 

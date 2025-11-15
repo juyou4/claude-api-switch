@@ -12,6 +12,46 @@
 
 A concise, efficient Claude CLI API configuration switching tool designed for remote environments and developers.
 
+## 📖 Table of Contents
+
+- [✨ Features](#-features)
+- [🏗️ Project Structure](#️-project-structure)
+- [🚀 Quick Start](#-quick-start)
+  - [Installation](#installation)
+  - [Basic Usage](#basic-usage)
+- [🎨 Advanced Features](#-advanced-features)
+  - [Interactive Configuration Creation](#interactive-configuration-creation)
+  - [Environment Variable Override](#environment-variable-override)
+  - [Smart Configuration Validation](#smart-configuration-validation)
+  - [Auto Backup Protection](#auto-backup-protection)
+- [📋 Quick Aliases](#-quick-aliases)
+- [🔐 Key Management](#-key-management)
+  - [Quick Setup Single API Key](#quick-setup-single-api-key)
+  - [Batch Setup All API Keys](#batch-setup-all-api-keys)
+  - [Security Features](#security-features)
+  - [Best Practices](#best-practices)
+- [🔧 Configuration Guide](#-configuration-guide)
+  - [Supported API Providers](#supported-api-providers)
+  - [UI Language Configurations](#ui-language-configurations)
+  - [Configuring API Keys](#configuring-api-keys)
+  - [Configuration File Format](#configuration-file-format)
+- [🎯 Use Cases](#-use-cases)
+- [🛠️ User Guide](#️-user-guide)
+  - [Interactive Menu](#interactive-menu)
+  - [Configuration Validation](#configuration-validation)
+  - [Error Handling](#error-handling)
+- [🔧 Custom Configuration](#-custom-configuration)
+  - [Adding New API Providers](#adding-new-api-providers)
+  - [Environment Variable Override](#environment-variable-override-1)
+- [📁 File Locations](#-file-locations)
+- [🔄 Uninstallation](#-uninstallation)
+- [🐛 Troubleshooting](#-troubleshooting)
+  - [Common Issues](#common-issues)
+  - [Debugging Tips](#debugging-tips)
+- [📝 Changelog](#-changelog)
+- [📄 License](#-license)
+- [🤝 Contributing](#-contributing)
+
 ## ✨ Features
 
 - 🚀 **Quick Switching** - One-click switching between multiple Claude API providers
@@ -466,7 +506,7 @@ cscreate work-project
 claude-switch work-project
 ```
 
-## 🛠️ Advanced Features
+## 🛠️ User Guide
 
 ### Interactive Menu
 
