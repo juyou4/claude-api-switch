@@ -55,7 +55,11 @@
       "4. Return to Main Menu"
     ],
     "exit": "Exit",
-    "invalid_choice": "Invalid choice"
+    "invalid_choice": "Invalid choice",
+    "press_enter_continue": "Press Enter to continue...",
+    "select_operation": "Please select operation (1-7): ",
+    "select_language_option": "Please select language option (1-4): ",
+    "input_prompt": "> "
   },
   "status": {
     "title": "Current Configuration Status:",

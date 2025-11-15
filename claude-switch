@@ -243,58 +243,58 @@ get_current_config() {
 
 # 显示配置状态
 show_status() {
-    echo -e "${BLUE}当前配置状态:${NC}"
+    echo -e "${BLUE}$(get_text "status.title")${NC}"
     echo "=================="
 
     # 检查配置文件是否存在，包括备用路径
     local actual_config="$CLAUDE_CONFIG"
     if [ ! -f "$CLAUDE_CONFIG" ] && [ -f "$ALTERNATIVE_CLAUDE_CONFIG" ]; then
         actual_config="$ALTERNATIVE_CLAUDE_CONFIG"
-        echo -e "${YELLOW}ℹ️  使用备用配置路径: $ALTERNATIVE_CLAUDE_CONFIG${NC}"
+        echo -e "${YELLOW}$(format_text "status.alternative_path" "path" "$ALTERNATIVE_CLAUDE_CONFIG")${NC}"
     fi
 
     if [ ! -f "$actual_config" ]; then
-        echo -e "${RED}❌ Claude配置文件不存在${NC}"
-        echo -e "${RED}   主路径: $CLAUDE_CONFIG${NC}"
-        echo -e "${RED}   备用路径: $ALTERNATIVE_CLAUDE_CONFIG${NC}"
+        echo -e "${RED}$(format_text "status.config_not_found" "path" "$CLAUDE_CONFIG")${NC}"
+        echo -e "${RED}   $(get_text "status.main_path"): $CLAUDE_CONFIG${NC}"
+        echo -e "${RED}   $(get_text "status.backup_path"): $ALTERNATIVE_CLAUDE_CONFIG${NC}"
         return 1
     fi
 
     local current=$(get_current_config)
-    echo -e "${GREEN}当前配置: $current${NC}"
+    echo -e "${GREEN}$(format_text "status.current" "name" "$current")${NC}"
 
     if command -v jq >/dev/null 2>&1; then
         echo ""
-        echo "API配置:"
-        jq -r '.env | to_entries[] | "  \(.key): \(.value)"' "$actual_config" 2>/dev/null || echo "  配置解析失败"
+        echo "$(get_text "status.api_config")"
+        jq -r '.env | to_entries[] | "  \(.key): \(.value)"' "$actual_config" 2>/dev/null || echo "  $(get_text "status.config_parse_failed")"
     else
         echo ""
-        echo "配置文件: $CLAUDE_CONFIG"
+        echo "$(format_text "status.config_exists" "path" "$CLAUDE_CONFIG")"
     fi
 }
 
 # 列出所有配置
 list_configs() {
-    echo -e "${BLUE}可用的API配置:${NC}"
+    echo -e "${BLUE}$(get_text "status.models_title")${NC}"
     echo "=================="
 
     local current=$(get_current_config)
 
     # 显示当前配置
     if [ -f "$CLAUDE_CONFIG" ]; then
-        echo -e "${GREEN}* 当前配置: $current${NC}"
+        echo -e "${GREEN}$(format_text "status.current_config" "name" "$current")${NC}"
         if command -v jq >/dev/null 2>&1; then
             local base_url=$(jq -r '.env.ANTHROPIC_BASE_URL // "未知"' "$CLAUDE_CONFIG")
             local model=$(jq -r '.env.ANTHROPIC_DEFAULT_SONNET_MODEL // "未知"' "$CLAUDE_CONFIG")
-            echo "  BASE_URL: $base_url"
-            echo "  MODEL: $model"
+            echo "$(format_text "status.base_url" "url" "$base_url")"
+            echo "$(format_text "status.model" "model" "$model")"
         fi
         echo ""
     fi
 
     # 显示可用配置
     if [ "$(ls -A "$CONFIG_DIR" 2>/dev/null)" ]; then
-        echo -e "${YELLOW}可用配置:${NC}"
+        echo -e "${YELLOW}$(get_text "status.available_configs")${NC}"
         local i=1
         for config in "$CONFIG_DIR"/*.json; do
             if [ -f "$config" ]; then
@@ -990,78 +990,104 @@ EOF
 interactive_menu() {
     while true; do
         clear
-        echo -e "${BLUE}Claude API 快速切换工具${NC}"
+        echo -e "${BLUE}$(get_text "menu.title")${NC}"
         echo "========================"
         echo ""
 
         show_status
         echo ""
 
-        echo "可用操作:"
-        echo "  1. 切换配置"
-        echo "  2. 保存当前配置"
-        echo "  3. 列出所有配置"
-        echo "  4. 删除配置"
-        echo "  5. 备份当前配置"
-        echo "  6. 语言切换"
-        echo "  7. 退出"
+        echo "$(get_text "menu.operations_title")"
+
+        # 动态显示操作选项
+        local resource_file="$I18N_DIR/$CURRENT_LANGUAGE.json"
+        if [ -f "$resource_file" ] && command -v jq >/dev/null 2>&1; then
+            local operations=$(jq -r '.menu.operations[]' "$resource_file" 2>/dev/null)
+            while IFS= read -r operation; do
+                if [ -n "$operation" ]; then
+                    echo "  $operation"
+                fi
+            done <<< "$operations"
+        else
+            # Fallback to hardcoded operations if jq not available
+            echo "  1. $(get_text "menu.switch_config" "Switch Configuration")"
+            echo "  2. $(get_text "menu.save_config" "Save Current Configuration")"
+            echo "  3. $(get_text "menu.list_configs" "List All Configurations")"
+            echo "  4. $(get_text "menu.delete_config" "Delete Configuration")"
+            echo "  5. $(get_text "menu.backup_config" "Backup Current Configuration")"
+            echo "  6. $(get_text "menu.language_switch" "Language Switch")"
+            echo "  7. $(get_text "menu.exit" "Exit")"
+        fi
         echo ""
 
-        read -p "请选择操作 (1-7): " -n 1 -r
+        read -p "$(get_text "menu.select_operation")" -n 1 -r
         echo ""
 
         case $REPLY in
             1)
                 echo ""
-                echo "请输入配置名称或编号:"
-                read -p "> " config_name
+                echo "$(get_text "menu.input_config")"
+                read -p "$(get_text "menu.input_prompt")" config_name
                 switch_config "$config_name"
-                read -p "按回车继续..."
+                read -p "$(get_text "menu.press_enter_continue")"
                 ;;
             2)
                 echo ""
-                echo "请输入新配置名称:"
-                read -p "> " config_name
+                echo "$(get_text "menu.input_save_name")"
+                read -p "$(get_text "menu.input_prompt")" config_name
                 save_config "$config_name"
-                read -p "按回车继续..."
+                read -p "$(get_text "menu.press_enter_continue")"
                 ;;
             3)
                 list_configs
-                read -p "按回车继续..."
+                read -p "$(get_text "menu.press_enter_continue")"
                 ;;
             4)
                 echo ""
-                echo "请输入要删除的配置名称:"
-                read -p "> " config_name
+                echo "$(get_text "menu.input_delete_name")"
+                read -p "$(get_text "menu.input_prompt")" config_name
                 delete_config "$config_name"
-                read -p "按回车继续..."
+                read -p "$(get_text "menu.press_enter_continue")"
                 ;;
             5)
                 backup_config
-                read -p "按回车继续..."
+                read -p "$(get_text "menu.press_enter_continue")"
                 ;;
             6)
                 echo ""
-                echo "语言切换选项:"
-                echo "  1. 中文界面 (zh-ui)"
-                echo "  2. 英文界面 (en-ui)"
-                echo "  3. 列出语言配置"
-                echo "  4. 返回主菜单"
+                echo "$(get_text "menu.language_title")"
+
+                # 动态显示语言选项
+                if [ -f "$resource_file" ] && command -v jq >/dev/null 2>&1; then
+                    local language_options=$(jq -r '.menu.language_options[]' "$resource_file" 2>/dev/null)
+                    while IFS= read -r option; do
+                        if [ -n "$option" ]; then
+                            echo "  $option"
+                        fi
+                    done <<< "$language_options"
+                else
+                    # Fallback language options
+                    echo "  1. Chinese Interface (zh-ui)"
+                    echo "  2. English Interface (en-ui)"
+                    echo "  3. List Language Configurations"
+                    echo "  4. Return to Main Menu"
+                fi
                 echo ""
-                read -p "请选择语言选项 (1-4): " -n 1 -r
+
+                read -p "$(get_text "menu.select_language_option")" -n 1 -r
                 echo ""
                 case $REPLY in
                     1)
                         switch_config "zh-ui"
-                        read -p "按回车继续..."
+                        read -p "$(get_text "menu.press_enter_continue")"
                         ;;
                     2)
                         switch_config "en-ui"
-                        read -p "按回车继续..."
+                        read -p "$(get_text "menu.press_enter_continue")"
                         ;;
                     3)
                         echo ""
-                        echo -e "${BLUE}可用的语言配置:${NC}"
+                        echo -e "${BLUE}$(get_text "language.title")${NC}"
                         echo "===================="
                         for config in "$CONFIG_DIR"/zh-ui.json "$CONFIG_DIR"/en-ui.json; do
                             if [ -f "$config" ]; then
@@ -1076,23 +1102,23 @@ interactive_menu() {
                                 fi
                             fi
                         done
-                        read -p "按回车继续..."
+                        read -p "$(get_text "menu.press_enter_continue")"
                         ;;
                     4)
                         ;;
                     *)
-                        echo -e "${RED}无效选择${NC}"
-                        read -p "按回车继续..."
+                        echo -e "${RED}$(get_text "menu.invalid_choice")${NC}"
+                        read -p "$(get_text "menu.press_enter_continue")"
                         ;;
                 esac
                 ;;
             7)
-                echo "退出"
+                echo "$(get_text "menu.exit")"
                 break
                 ;;
             *)
-                echo -e "${RED}无效选择${NC}"
-                read -p "按回车继续..."
+                echo -e "${RED}$(get_text "menu.invalid_choice")${NC}"
+                read -p "$(get_text "menu.press_enter_continue")"
                 ;;
         esac
     done

@@ -55,7 +55,11 @@
       "4. 返回主菜单"
     ],
     "exit": "退出",
-    "invalid_choice": "无效选择"
+    "invalid_choice": "无效选择",
+    "press_enter_continue": "按回车继续...",
+    "select_operation": "请选择操作 (1-7): ",
+    "select_language_option": "请选择语言选项 (1-4): ",
+    "input_prompt": "> "
   },
   "status": {
     "title": "当前配置状态:",
