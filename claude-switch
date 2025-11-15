@@ -22,6 +22,10 @@ CLAUDE_CONFIG="$HOME/.claude/settings.json"
 BACKUP_DIR="$HOME/.claude/backups"
 ACTIVE_MARKER="$HOME/.claude/.active_config"
 
+# 备用配置路径（用于权限问题时的fallback）
+ALTERNATIVE_CLAUDE_CONFIG="$HOME/.claude-config/settings.json"
+ALTERNATIVE_CONFIG_DIR="$HOME/.claude-config/configs"
+
 # 确保目录存在
 ensure_dirs() {
     mkdir -p "$CONFIG_DIR" "$BACKUP_DIR"
@@ -174,8 +178,17 @@ show_status() {
     echo -e "${BLUE}当前配置状态:${NC}"
     echo "=================="
 
-    if [ ! -f "$CLAUDE_CONFIG" ]; then
+    # 检查配置文件是否存在，包括备用路径
+    local actual_config="$CLAUDE_CONFIG"
+    if [ ! -f "$CLAUDE_CONFIG" ] && [ -f "$ALTERNATIVE_CLAUDE_CONFIG" ]; then
+        actual_config="$ALTERNATIVE_CLAUDE_CONFIG"
+        echo -e "${YELLOW}ℹ️  使用备用配置路径: $ALTERNATIVE_CLAUDE_CONFIG${NC}"
+    fi
+
+    if [ ! -f "$actual_config" ]; then
         echo -e "${RED}❌ Claude配置文件不存在${NC}"
+        echo -e "${RED}   主路径: $CLAUDE_CONFIG${NC}"
+        echo -e "${RED}   备用路径: $ALTERNATIVE_CLAUDE_CONFIG${NC}"
         return 1
     fi
 
@@ -185,7 +198,7 @@ show_status() {
     if command -v jq >/dev/null 2>&1; then
         echo ""
         echo "API配置:"
-        jq -r '.env | to_entries[] | "  \(.key): \(.value)"' "$CLAUDE_CONFIG" 2>/dev/null || echo "  配置解析失败"
+        jq -r '.env | to_entries[] | "  \(.key): \(.value)"' "$actual_config" 2>/dev/null || echo "  配置解析失败"
     else
         echo ""
         echo "配置文件: $CLAUDE_CONFIG"
@@ -382,10 +395,30 @@ apply_config_with_env_overrides() {
     fi
 
     # 应用配置到Claude settings.json
-    if ! cp "$temp_config" "$CLAUDE_CONFIG"; then
-        echo -e "${RED}❌ 切换失败: 无法写入 $CLAUDE_CONFIG${NC}"
-        rm -f "$temp_config"
-        return 1
+    if ! cp "$temp_config" "$CLAUDE_CONFIG" 2>/dev/null; then
+        echo -e "${YELLOW}⚠️  主配置路径写入失败，尝试备用路径${NC}"
+
+        # 尝试使用备用配置路径
+        mkdir -p "$(dirname "$ALTERNATIVE_CLAUDE_CONFIG")"
+        if ! cp "$temp_config" "$ALTERNATIVE_CLAUDE_CONFIG"; then
+            echo -e "${RED}❌ 切换失败: 无法写入配置文件${NC}"
+            echo -e "${RED}   主路径: $CLAUDE_CONFIG${NC}"
+            echo -e "${RED}   备用路径: $ALTERNATIVE_CLAUDE_CONFIG${NC}"
+            echo ""
+            echo -e "${CYAN}💡 可能的解决方案:${NC}"
+            echo "   1. 检查 ~/.claude/ 目录权限: chmod 755 ~/.claude"
+            echo "   2. 运行权限诊断脚本: ./diagnose_permissions.sh"
+            echo "   3. 尝试手动设置环境变量:"
+            echo "      export ANTHROPIC_AUTH_TOKEN='your-api-key'"
+            echo "      export ANTHROPIC_BASE_URL='your-base-url'"
+            echo ""
+            rm -f "$temp_config"
+            return 1
+        else
+            echo -e "${GREEN}✅ 已使用备用配置路径: $ALTERNATIVE_CLAUDE_CONFIG${NC}"
+            echo -e "${YELLOW}⚠️  请设置环境变量 CLAUDE_CONFIG_DIR=$HOME/.claude-config${NC}"
+            CLAUDE_CONFIG="$ALTERNATIVE_CLAUDE_CONFIG"
+        fi
     fi
 
     rm -f "$temp_config"
