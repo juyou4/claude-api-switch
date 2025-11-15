@@ -1,0 +1,183 @@
+{
+  "app": {
+    "title": "Claude API Quick Switch Tool",
+    "description": "A concise API provider switching tool designed for developers"
+  },
+  "help": {
+    "title": "Usage:",
+    "usage": [
+      "$0 [name]              # Switch to specified API provider",
+      "$0 [number]            # Switch using number (1=GLM, 2=Kimi2, 3=MiniMax)",
+      "$0 list                # List all available configurations",
+      "$0 status              # Display current configuration status",
+      "$0 backup              # Manually backup current configuration",
+      "$0 help                # Display this help information"
+    ],
+    "aliases_title": "Quick Aliases (run install script first):",
+    "aliases": [
+      "cs <name>              # Quick switch",
+      "csl                   # List configurations",
+      "csst                  # View status"
+    ],
+    "providers_title": "Supported API Providers:",
+    "providers": [
+      "glm                   # Zhipu GLM",
+      "kimi                  # Moonshot Kimi2",
+      "minimax               # MiniMax"
+    ],
+    "examples_title": "Examples:",
+    "examples": [
+      "$0 glm                # Switch to GLM",
+      "$0 2                  # Switch to second configuration",
+      "cs kimi               # Use alias to switch to Kimi"
+    ]
+  },
+  "menu": {
+    "title": "Claude API Quick Switch Tool",
+    "operations_title": "Available Operations:",
+    "operations": [
+      "1. Switch Configuration",
+      "2. Save Current Configuration",
+      "3. List All Configurations",
+      "4. Delete Configuration",
+      "5. Backup Current Configuration",
+      "6. Language Switch",
+      "7. Exit"
+    ],
+    "input_config": "Please enter configuration name or number:",
+    "input_save_name": "Please enter new configuration name:",
+    "input_delete_name": "Please enter configuration name to delete:",
+    "language_title": "Language Switch Options:",
+    "language_options": [
+      "1. Chinese Interface (zh-ui)",
+      "2. English Interface (en-ui)",
+      "3. List Language Configurations",
+      "4. Return to Main Menu"
+    ],
+    "exit": "Exit",
+    "invalid_choice": "Invalid choice"
+  },
+  "status": {
+    "title": "Current Configuration Status:",
+    "current": "Current configuration: {name}",
+    "alternative_path": "ℹ️  Using alternative configuration path: {path}",
+    "config_not_found": "❌ Claude configuration file not found: {path}",
+    "main_path": "   Main path: {path}",
+    "backup_path": "   Backup path: {path}",
+    "config_exists": "Configuration file: {path}",
+    "api_config": "API Configuration:",
+    "config_parse_failed": "  Configuration parsing failed",
+    "models_title": "Available API Configurations:",
+    "current_config": "* Current configuration: {name}",
+    "available_configs": "Available configurations:",
+    "no_configs": "No configuration files found",
+    "config_dir": "Configuration directory: {path}",
+    "base_url": "  BASE_URL: {url}",
+    "model": "  MODEL: {model}",
+    "models_count": "  Available models: {count}",
+    "jq_note": "  (jq required for detailed information)",
+    "env_overrides": "  🔧 Environment variable overrides: {vars}"
+  },
+  "messages": {
+    "success": {
+      "language_valid": "✅ Language interface configuration validated successfully",
+      "language_info": "ℹ️ Language configuration uses API key from environment variables",
+      "config_switched": "✅ Switched to configuration: {name}",
+      "config_saved": "✅ Configuration saved: {name}",
+      "config_created": "✅ Configuration '{name}' created successfully",
+      "config_deleted": "✅ Configuration '{name}' deleted successfully",
+      "config_backed_up": "✅ Configuration backed up to: {path}",
+      "backup_created": "📦 Backup created: {path}",
+      "using_alternative": "✅ Using alternative configuration path: {path}"
+    },
+    "errors": {
+      "config_not_found": "❌ Claude configuration file not found: {path}",
+      "no_config_backup": "❌ No configuration file available for backup",
+      "backup_failed": "❌ Backup failed: Cannot write to {path}",
+      "no_config_specified": "❌ Please specify configuration to switch",
+      "usage_switch": "Usage: $0 <configuration_name_or_number>",
+      "use_list": "Use '$0 list' to view available configurations",
+      "config_number_invalid": "❌ Configuration number {number} does not exist",
+      "config_name_invalid": "❌ Configuration '{name}' does not exist",
+      "config_format_invalid": "❌ Invalid configuration file format: {path}",
+      "config_validation_failed": "❌ Configuration validation failed, please check configuration file",
+      "api_key_placeholder": "API key not configured or is placeholder",
+      "marker_update_failed": "⚠️ Cannot update active configuration marker ({path}), please check permissions manually",
+      "write_failed": "❌ Switch failed: Cannot write configuration file",
+      "save_no_name": "❌ Please provide configuration name",
+      "usage_save": "Usage: $0 save <configuration_name>",
+      "name_format_invalid": "❌ Configuration name can only contain letters, numbers, underscores and hyphens",
+      "save_current_config_missing": "❌ Current Claude configuration file not found: {path}",
+      "save_current_config_invalid": "❌ Current configuration file format invalid, cannot save",
+      "save_failed": "❌ Save configuration failed",
+      "delete_no_name": "❌ Please provide configuration name to delete",
+      "usage_delete": "Usage: $0 delete <configuration_name>",
+      "delete_current_active": "❌ Cannot delete currently active configuration '{name}'",
+      "delete_switch_first": "Please switch to another configuration before deleting this one",
+      "delete_config_not_found": "❌ Configuration '{name}' does not exist",
+      "input_timeout": "❌ Input timeout, operation cancelled",
+      "operation_cancelled": "Operation cancelled",
+      "name_empty": "❌ Configuration name cannot be empty",
+      "name_exists": "⚠️ Configuration '{name}' already exists",
+      "name_format_error": "❌ Invalid configuration name format, only letters, numbers, underscores and hyphens allowed",
+      "no_choice": "❌ Invalid choice",
+      "no_templates": "❌ No available template files found",
+      "template_dir_hint": "  Please ensure template files exist in {dir} directory",
+      "template_not_found": "❌ Template file '{name}' does not exist",
+      "available_templates": "  Available template files:",
+      "no_template_files": "    No template files",
+      "choice_range": "❌ Invalid choice, please enter a number between 1-{count}",
+      "current_config_missing": "❌ Current Claude configuration file not found",
+      "create_config_first": "Please use Claude CLI once first to create configuration file"
+    },
+    "warnings": {
+      "jq_required": "⚠️ jq required for complete validation",
+      "config_validation_failed": "Configuration validation failed:",
+      "config_warnings": "Configuration warnings:",
+      "main_path_failed": "⚠️  Main configuration path write failed, trying alternative path",
+      "config_exists": "⚠️ Configuration '{name}' already exists",
+      "delete_warning": "⚠️ About to delete configuration: {name}",
+      "delete_file": "  File: {path}",
+      "env_override_detected": "🔧 Environment variable overrides detected, applying...",
+      "alternative_config": "⚠️  Please set environment variable CLAUDE_CONFIG_DIR={path}"
+    },
+    "info": {
+      "check_api_connection": "🔍 Checking API connectivity...",
+      "api_reachable": "✅ API endpoint reachable",
+      "api_unreachable": "⚠️ API endpoint unreachable, please check network connection",
+      "curl_required": "📝 curl required to check API connectivity",
+      "restart_claude": "💡 Restart Claude CLI to apply new configuration",
+      "possible_solutions": "💡 Possible solutions:",
+      "solution1": "   1. Check ~/.claude/ directory permissions: chmod 755 ~/.claude",
+      "solution2": "   2. Run permission diagnostic script: ./diagnose_permissions.sh",
+      "solution3": "   3. Try setting environment variables manually:",
+      "env_var_example1": "      export ANTHROPIC_AUTH_TOKEN='your-api-key'",
+      "env_var_example2": "      export ANTHROPIC_BASE_URL='your-base-url'",
+      "location": "  Location: {path}",
+      "base_url": "  BASE_URL: {url}",
+      "model": "  Default model: {model}",
+      "config_file_location": "  Configuration file location: {path}",
+      "edit_config_hint": "  Please edit configuration file to set your API key and other parameters"
+    }
+  },
+  "create_wizard": {
+    "title": "🔧 Interactive Configuration Creation Wizard",
+    "input_error": "❌ Input timeout or cannot read input, exiting...",
+    "choose_method": "Please select configuration method:",
+    "methods": [
+      "1. Based on existing provider templates",
+      "2. Based on current Claude configuration",
+      "3. Fully custom configuration"
+    ],
+    "templates_title": "📋 Available Provider Templates:",
+    "creating_from_template": "Creating configuration based on template...",
+    "based_on_current": "Creating new configuration based on current configuration...",
+    "custom_title": "🛠️  Custom Configuration Creation",
+    "api_config_title": "API Configuration:",
+    "created_success": "✅ Custom configuration '{name}' created successfully"
+  },
+  "language": {
+    "title": "Available Language Configurations:",
+    "switching": "Language Switch"
+  }
+}

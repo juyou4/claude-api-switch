@@ -1,0 +1,183 @@
+{
+  "app": {
+    "title": "Claude API 快速切换工具",
+    "description": "专为开发者设计的简洁API供应商切换工具"
+  },
+  "help": {
+    "title": "用法:",
+    "usage": [
+      "$0 [名称]              # 切换到指定API供应商",
+      "$0 [编号]              # 使用编号切换 (1=GLM, 2=Kimi2, 3=MiniMax)",
+      "$0 list                # 列出所有可用配置",
+      "$0 status              # 显示当前配置状态",
+      "$0 backup              # 手动备份当前配置",
+      "$0 help                # 显示此帮助信息"
+    ],
+    "aliases_title": "快速别名 (需要先运行安装脚本):",
+    "aliases": [
+      "cs <名称>              # 快速切换",
+      "csl                   # 列出配置",
+      "csst                  # 查看状态"
+    ],
+    "providers_title": "支持的API供应商:",
+    "providers": [
+      "glm                   # 智谱GLM",
+      "kimi                  # 月之暗面Kimi2",
+      "minimax               # MiniMax"
+    ],
+    "examples_title": "示例:",
+    "examples": [
+      "$0 glm                # 切换到GLM",
+      "$0 2                  # 切换到第二个配置",
+      "cs kimi               # 使用别名切换到Kimi"
+    ]
+  },
+  "menu": {
+    "title": "Claude API 快速切换工具",
+    "operations_title": "可用操作:",
+    "operations": [
+      "1. 切换配置",
+      "2. 保存当前配置",
+      "3. 列出所有配置",
+      "4. 删除配置",
+      "5. 备份当前配置",
+      "6. 语言切换",
+      "7. 退出"
+    ],
+    "input_config": "请输入配置名称或编号:",
+    "input_save_name": "请输入新配置名称:",
+    "input_delete_name": "请输入要删除的配置名称:",
+    "language_title": "语言切换选项:",
+    "language_options": [
+      "1. 中文界面 (zh-ui)",
+      "2. 英文界面 (en-ui)",
+      "3. 列出语言配置",
+      "4. 返回主菜单"
+    ],
+    "exit": "退出",
+    "invalid_choice": "无效选择"
+  },
+  "status": {
+    "title": "当前配置状态:",
+    "current": "当前配置: {name}",
+    "alternative_path": "ℹ️  使用备用配置路径: {path}",
+    "config_not_found": "❌ Claude配置文件不存在: {path}",
+    "main_path": "   主路径: {path}",
+    "backup_path": "   备用路径: {path}",
+    "config_exists": "配置文件: {path}",
+    "api_config": "API配置:",
+    "config_parse_failed": "  配置解析失败",
+    "models_title": "可用的API配置:",
+    "current_config": "* 当前配置: {name}",
+    "available_configs": "可用配置:",
+    "no_configs": "没有找到配置文件",
+    "config_dir": "配置目录: {path}",
+    "base_url": "  BASE_URL: {url}",
+    "model": "  MODEL: {model}",
+    "models_count": "  可用模型: {count} 个",
+    "jq_note": "  (需要安装jq以显示详细信息)",
+    "env_overrides": "  🔧 环境变量覆盖: {vars}"
+  },
+  "messages": {
+    "success": {
+      "language_valid": "✅ 语言界面配置验证通过",
+      "language_info": "ℹ️ 语言配置使用环境变量中的API密钥",
+      "config_switched": "✅ 已切换到配置: {name}",
+      "config_saved": "✅ 配置已保存: {name}",
+      "config_created": "✅ 配置 '{name}' 已创建",
+      "config_deleted": "✅ 配置 '{name}' 已删除",
+      "config_backed_up": "✅ 配置已备份到: {path}",
+      "backup_created": "📦 已创建备份: {path}",
+      "using_alternative": "✅ 已使用备用配置路径: {path}"
+    },
+    "errors": {
+      "config_not_found": "❌ Claude配置文件不存在: {path}",
+      "no_config_backup": "❌ 没有可备份的配置文件",
+      "backup_failed": "❌ 备份失败: 无法写入 {path}",
+      "no_config_specified": "❌ 请指定要切换的配置",
+      "usage_switch": "用法: $0 <配置名称或编号>",
+      "use_list": "使用 '$0 list' 查看可用配置",
+      "config_number_invalid": "❌ 配置编号 {number} 不存在",
+      "config_name_invalid": "❌ 配置 '{name}' 不存在",
+      "config_format_invalid": "❌ 配置文件格式无效: {path}",
+      "config_validation_failed": "❌ 配置验证失败，请检查配置文件",
+      "api_key_placeholder": "API密钥未配置或为占位符",
+      "marker_update_failed": "⚠️ 无法更新活动配置标记 ({path})，请手动检查权限",
+      "write_failed": "❌ 切换失败: 无法写入配置文件",
+      "save_no_name": "❌ 请提供配置名称",
+      "usage_save": "用法: $0 save <配置名称>",
+      "name_format_invalid": "❌ 配置名称只能包含字母、数字、下划线和连字符",
+      "save_current_config_missing": "❌ 当前Claude配置文件不存在: {path}",
+      "save_current_config_invalid": "❌ 当前配置文件格式无效，无法保存",
+      "save_failed": "❌ 保存配置失败",
+      "delete_no_name": "❌ 请提供要删除的配置名称",
+      "usage_delete": "用法: $0 delete <配置名称>",
+      "delete_current_active": "❌ 无法删除当前活动配置 '{name}'",
+      "delete_switch_first": "请先切换到其他配置再删除此配置",
+      "delete_config_not_found": "❌ 配置 '{name}' 不存在",
+      "input_timeout": "❌ 输入超时，操作取消",
+      "operation_cancelled": "操作已取消",
+      "name_empty": "❌ 配置名称不能为空",
+      "name_exists": "⚠️ 配置 '{name}' 已存在",
+      "name_format_error": "❌ 配置名称格式无效，只允许字母、数字、下划线和连字符",
+      "no_choice": "❌ 无效选择",
+      "no_templates": "❌ 没有找到可用的模板文件",
+      "template_dir_hint": "  请确保 {dir} 目录下有模板文件",
+      "template_not_found": "❌ 模板文件 '{name}' 不存在",
+      "available_templates": "  可用模板文件：",
+      "no_template_files": "    无模板文件",
+      "choice_range": "❌ 无效选择，请输入 1-{count} 之间的数字",
+      "current_config_missing": "❌ 当前Claude配置文件不存在",
+      "create_config_first": "请先使用Claude CLI进行一次连接以创建配置文件"
+    },
+    "warnings": {
+      "jq_required": "⚠️ 需要安装jq以进行完整验证",
+      "config_validation_failed": "配置验证失败:",
+      "config_warnings": "配置警告:",
+      "main_path_failed": "⚠️  主配置路径写入失败，尝试备用路径",
+      "config_exists": "⚠️ 配置 '{name}' 已存在",
+      "delete_warning": "⚠️ 即将删除配置: {name}",
+      "delete_file": "  文件: {path}",
+      "env_override_detected": "🔧 检测到环境变量覆盖，正在应用...",
+      "alternative_config": "⚠️  请设置环境变量 CLAUDE_CONFIG_DIR={path}"
+    },
+    "info": {
+      "check_api_connection": "🔍 检查API连接性...",
+      "api_reachable": "✅ API端点可达",
+      "api_unreachable": "⚠️ API端点不可达，请检查网络连接",
+      "curl_required": "📝 需要安装curl以检查API连接性",
+      "restart_claude": "💡 重启Claude CLI以应用新配置",
+      "possible_solutions": "💡 可能的解决方案:",
+      "solution1": "   1. 检查 ~/.claude/ 目录权限: chmod 755 ~/.claude",
+      "solution2": "   2. 运行权限诊断脚本: ./diagnose_permissions.sh",
+      "solution3": "   3. 尝试手动设置环境变量:",
+      "env_var_example1": "      export ANTHROPIC_AUTH_TOKEN='your-api-key'",
+      "env_var_example2": "      export ANTHROPIC_BASE_URL='your-base-url'",
+      "location": "  位置: {path}",
+      "base_url": "  BASE_URL: {url}",
+      "model": "  默认模型: {model}",
+      "config_file_location": "  配置文件位置: {path}",
+      "edit_config_hint": "  请编辑配置文件以设置您的API密钥和其他参数"
+    }
+  },
+  "create_wizard": {
+    "title": "🔧 交互式配置创建向导",
+    "input_error": "❌ 输入超时或无法读取输入，正在退出...",
+    "choose_method": "请选择配置方式:",
+    "methods": [
+      "1. 基于现有提供商模板",
+      "2. 基于当前Claude配置",
+      "3. 完全自定义配置"
+    ],
+    "templates_title": "📋 可用的提供商模板:",
+    "creating_from_template": "正在基于模板创建配置...",
+    "based_on_current": "正在基于当前配置创建新配置...",
+    "custom_title": "🛠️  自定义配置创建",
+    "api_config_title": "API配置:",
+    "created_success": "✅ 自定义配置 '{name}' 已创建"
+  },
+  "language": {
+    "title": "可用的语言配置:",
+    "switching": "语言切换"
+  }
+}

@@ -1,13 +1,17 @@
 #!/bin/bash
 
-# Claude API 快速切换工具
-# 专为开发者设计的简洁API供应商切换工具
-# 支持: GLM、Kimi2、MiniMax等
+# Claude API Quick Switch Tool
+# A concise API provider switching tool designed for developers
+# Supports: GLM, Kimi2, MiniMax, etc.
 
-# 版本: 1.0.0
-# 作者: 基于claude-switch重构
+# Version: 2.1.0
+# Multi-language Support Enhanced
 
-# 颜色定义
+# Load multi-language system
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/i18n/loader.sh"
+
+# Color definitions
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -15,8 +19,7 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# 配置路径
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Configuration paths
 CONFIG_DIR="$HOME/.claude/configs"
 CLAUDE_CONFIG="$HOME/.claude/settings.json"
 BACKUP_DIR="$HOME/.claude/backups"
@@ -34,8 +37,8 @@ ensure_dirs() {
 # 检查配置文件
 check_config_file() {
     if [ ! -f "$CLAUDE_CONFIG" ]; then
-        echo -e "${RED}❌ Claude配置文件不存在: $CLAUDE_CONFIG${NC}"
-        echo -e "${YELLOW}💡 请确保Claude CLI已安装并至少使用过一次${NC}"
+        echo -e "${RED}$(format_text "messages.errors.config_not_found" "path" "$CLAUDE_CONFIG")${NC}"
+        echo -e "${YELLOW}💡 $(get_text "messages.info.create_config_first")${NC}"
         return 1
     fi
 }
@@ -73,14 +76,14 @@ validate_config_completeness() {
 
     # 语言界面配置特殊处理：跳过API密钥验证
     if [ "$provider" = "language-ui" ]; then
-        echo -e "${GREEN}✅ 语言界面配置验证通过${NC}"
-        echo -e "${CYAN}ℹ️ 语言配置使用环境变量中的API密钥${NC}"
+        echo -e "${GREEN}$(get_text "messages.success.language_valid")${NC}"
+        echo -e "${CYAN}$(get_text "messages.success.language_info")${NC}"
         return 0
     fi
 
     # 检查API密钥（仅对API提供商配置）
     if [ -z "$auth_token" ] || [ "$auth_token" = "your-api-key-here" ] || [ "$auth_token" = "sk-your-api-key-here" ]; then
-        errors+=("❌ API密钥未配置或为占位符")
+        errors+=("❌ $(get_text "messages.errors.api_key_placeholder")")
     fi
 
     # 检查API端点
@@ -100,7 +103,7 @@ validate_config_completeness() {
 
     # 显示验证结果
     if [ ${#errors[@]} -gt 0 ]; then
-        echo -e "${RED}配置验证失败:${NC}"
+        echo -e "${RED}$(get_text "messages.errors.config_validation_failed")${NC}"
         for error in "${errors[@]}"; do
             echo "  $error"
         done
@@ -108,7 +111,7 @@ validate_config_completeness() {
     fi
 
     if [ ${#warnings[@]} -gt 0 ]; then
-        echo -e "${YELLOW}配置警告:${NC}"
+        echo -e "${YELLOW}$(get_text "messages.warnings.config_warnings")${NC}"
         for warning in "${warnings[@]}"; do
             echo "  $warning"
         done
@@ -138,30 +141,95 @@ validate_api_connectivity() {
 
 # 显示帮助信息
 show_help() {
-    echo -e "${BLUE}Claude API 快速切换工具${NC}"
+    echo -e "${BLUE}$(get_text "app.title")${NC}"
     echo ""
-    echo "用法:"
-    echo "  $0 [名称]              # 切换到指定API供应商"
-    echo "  $0 [编号]              # 使用编号切换 (1=GLM, 2=Kimi2, 3=MiniMax)"
-    echo "  $0 list                # 列出所有可用配置"
-    echo "  $0 status              # 显示当前配置状态"
-    echo "  $0 backup              # 手动备份当前配置"
-    echo "  $0 help                # 显示此帮助信息"
-    echo ""
-    echo "快速别名 (需要先运行安装脚本):"
-    echo "  cs <名称>              # 快速切换"
-    echo "  csl                   # 列出配置"
-    echo "  csst                  # 查看状态"
-    echo ""
-    echo "支持的API供应商:"
-    echo "  glm                   # 智谱GLM"
-    echo "  kimi                  # 月之暗面Kimi2"
-    echo "  minimax               # MiniMax"
-    echo ""
-    echo "示例:"
-    echo "  $0 glm                # 切换到GLM"
-    echo "  $0 2                  # 切换到第二个配置"
-    echo "  cs kimi               # 使用别名切换到Kimi"
+    echo "$(get_text "help.title")"
+
+    # 显示用法信息 - 简化处理，直接读取JSON数组
+    if command -v jq >/dev/null 2>&1; then
+        local resource_file="$I18N_DIR/$CURRENT_LANGUAGE.json"
+        if [ -f "$resource_file" ]; then
+            echo ""
+            # 用法信息
+            local usage_items=$(jq -r '.help.usage[]' "$resource_file" 2>/dev/null)
+            while IFS= read -r line; do
+                if [ -n "$line" ]; then
+                    echo "  $(format_text_line "$line" "0" "$0")"
+                fi
+            done <<< "$usage_items"
+
+            echo ""
+            echo "$(get_text "help.aliases_title")"
+            # 别名信息
+            local alias_items=$(jq -r '.help.aliases[]' "$resource_file" 2>/dev/null)
+            while IFS= read -r line; do
+                if [ -n "$line" ]; then
+                    echo "  $line"
+                fi
+            done <<< "$alias_items"
+
+            echo ""
+            echo "$(get_text "help.providers_title")"
+            # 供应商信息
+            local provider_items=$(jq -r '.help.providers[]' "$resource_file" 2>/dev/null)
+            while IFS= read -r line; do
+                if [ -n "$line" ]; then
+                    echo "  $line"
+                fi
+            done <<< "$provider_items"
+
+            echo ""
+            echo "$(get_text "help.examples_title")"
+            # 示例信息
+            local example_items=$(jq -r '.help.examples[]' "$resource_file" 2>/dev/null)
+            while IFS= read -r line; do
+                if [ -n "$line" ]; then
+                    echo "  $(format_text_line "$line" "0" "$0")"
+                fi
+            done <<< "$example_items"
+        fi
+    fi
+}
+
+# 切换语言
+switch_language_to() {
+    local target_lang="$1"
+
+    # 验证语言资源是否存在
+    local resource_file="$I18N_DIR/$target_lang.json"
+    if [ ! -f "$resource_file" ]; then
+        echo -e "${RED}❌ $(format_text "messages.errors.config_not_found" "path" "$resource_file")${NC}"
+        return 1
+    fi
+
+    # 切换语言
+    if set_language "$target_lang"; then
+        echo -e "${GREEN}$(get_text "messages.success.language_valid")${NC}"
+        echo -e "${CYAN}$(get_text "messages.success.language_info")${NC}"
+
+        # 可选：设置环境变量以便后续会话记住语言选择
+        export CLAUDE_LANG="$target_lang"
+
+        # 显示当前语言的帮助信息
+        echo ""
+        show_help
+    else
+        echo -e "${RED}❌ $(format_text "messages.errors.config_not_found" "path" "$resource_file")${NC}"
+        return 1
+    fi
+}
+
+# 辅助函数：格式化文本行（支持简单的$0替换）
+format_text_line() {
+    local line="$1"
+    local param_name="$2"
+    local param_value="$3"
+
+    if [ -n "$param_value" ]; then
+        line="${line//\$$param_name/$param_value}"
+    fi
+
+    echo "$line"
 }
 
 # 获取当前配置信息
@@ -283,9 +351,9 @@ switch_config() {
     local target="$1"
 
     if [ -z "$target" ]; then
-        echo -e "${RED}❌ 请指定要切换的配置${NC}"
-        echo "用法: $0 <配置名称或编号>"
-        echo "使用 '$0 list' 查看可用配置"
+        echo -e "${RED}$(get_text "messages.errors.no_config_specified")${NC}"
+        echo "$(format_text "messages.errors.usage_switch" "0" "$0")"
+        echo "$(format_text "messages.errors.use_list" "0" "$0")"
         return 1
     fi
 
@@ -299,8 +367,8 @@ switch_config() {
         if [ $index -ge 0 ] && [ $index -lt ${#configs[@]} ] && [ -f "${configs[$index]}" ]; then
             target=$(basename "${configs[$index]}" .json)
         else
-            echo -e "${RED}❌ 配置编号 $target 不存在${NC}"
-            echo "使用 '$0 list' 查看可用配置"
+            echo -e "${RED}$(format_text "messages.errors.config_number_invalid" "number" "$target")${NC}"
+            echo "$(format_text "messages.errors.use_list" "0" "$0")"
             return 1
         fi
     fi
@@ -309,20 +377,20 @@ switch_config() {
     local config_file="$CONFIG_DIR/$target.json"
 
     if [ ! -f "$config_file" ]; then
-        echo -e "${RED}❌ 配置 '$target' 不存在${NC}"
-        echo "使用 '$0 list' 查看可用配置"
+        echo -e "${RED}$(format_text "messages.errors.config_name_invalid" "name" "$target")${NC}"
+        echo "$(format_text "messages.errors.use_list" "0" "$0")"
         return 1
     fi
 
     # 验证配置文件格式
     if ! validate_json "$config_file"; then
-        echo -e "${RED}❌ 配置文件格式无效: $config_file${NC}"
+        echo -e "${RED}$(format_text "messages.errors.config_format_invalid" "path" "$config_file")${NC}"
         return 1
     fi
 
     # 验证配置完整性
     if ! validate_config_completeness "$config_file"; then
-        echo -e "${RED}❌ 配置验证失败，请检查配置文件${NC}"
+        echo -e "${RED}$(get_text "messages.errors.config_validation_failed")${NC}"
         return 1
     fi
 
@@ -1031,7 +1099,43 @@ interactive_menu() {
 }
 
 # 主程序
+# 预处理命令行参数（处理--lang参数）
+preprocess_args() {
+    local args=("$@")
+    local filtered_args=()
+    local i=0
+
+    while [ $i -lt ${#args[@]} ]; do
+        local arg="${args[$i]}"
+        case "$arg" in
+            --lang=*)
+                # 语言参数在init_i18n中处理，跳过
+                ;;
+            -l)
+                # 跳过语言参数和下一个参数
+                ((i++))
+                ;;
+            *)
+                filtered_args+=("$arg")
+                ;;
+        esac
+        ((i++))
+    done
+
+    # 设置处理后的参数数组
+    set -- "${filtered_args[@]}"
+}
+
 main() {
+    # 保存原始参数用于i18n初始化
+    local original_args=("$@")
+
+    # 预处理参数
+    preprocess_args "$@"
+
+    # Initialize i18n system with original arguments
+    init_i18n "${original_args[@]}"
+
     ensure_dirs
     check_config_file
 
@@ -1053,6 +1157,12 @@ main() {
             ;;
         "backup")
             backup_config
+            ;;
+        "zh-ui"|"chinese"|"中文")
+            switch_language_to "zh-CN"
+            ;;
+        "en-ui"|"english"|"英文")
+            switch_language_to "en-US"
             ;;
         "help"|"-h"|"--help")
             show_help
