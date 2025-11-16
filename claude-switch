@@ -269,9 +269,10 @@ check_router_status() {
     local router_installed=false
     local router_running=false
     local router_port=3456
+    local router_pid=""
 
-    # 检查路由器是否安装
-    if command -v claude-code-router >/dev/null 2>&1; then
+    # 检查路由器是否安装 (支持 ccr 和 claude-code-router)
+    if command -v claude-code-router >/dev/null 2>&1 || command -v ccr >/dev/null 2>&1; then
         router_installed=true
         echo -e "${GREEN}✅ $(get_text "router.installed")${NC}"
     else
@@ -297,6 +298,18 @@ check_router_status() {
             fi
         else
             echo -e "${YELLOW}⚠️ $(get_text "router.cannot_check")${NC}"
+        fi
+
+        # 检查PID文件
+        local pid_file="$HOME/.claude/router.pid"
+        if [ -f "$pid_file" ]; then
+            router_pid=$(cat "$pid_file")
+            if kill -0 "$router_pid" 2>/dev/null; then
+                echo -e "  ${CYAN}PID: $router_pid${NC}"
+            else
+                echo -e "  ${YELLOW}PID文件存在但进程不在运行${NC}"
+                rm -f "$pid_file"
+            fi
         fi
     fi
 
@@ -344,6 +357,156 @@ check_router_status() {
         echo -e "${RED}❌ $(get_text "router.status.not_installed")${NC}"
         echo -e "${CYAN}💡 $(get_text "router.setup_hint")${NC}"
     fi
+}
+
+# 安装路由器
+setup_router() {
+    echo -e "${BLUE}🚀 $(get_text "router.setup_title")${NC}"
+    echo "=================="
+    echo ""
+
+    # 检查依赖
+    echo -e "${CYAN}$(get_text "router.dependency_check")${NC}"
+    echo "------------------"
+
+    # 检查 Node.js
+    echo -n "检查 Node.js... "
+    if command -v node >/dev/null 2>&1; then
+        local node_version=$(node --version)
+        echo -e "${GREEN}✅ $node_version${NC}"
+    else
+        echo -e "${RED}❌ 未安装${NC}"
+        echo -e "${YELLOW}💡 $(get_text "router.node_hint")${NC}"
+        echo "   Ubuntu/Debian: sudo apt-get install nodejs npm"
+        echo "   macOS: brew install node"
+        echo "   或访问: https://nodejs.org/"
+        return 1
+    fi
+
+    # 检查 npm
+    echo -n "检查 npm... "
+    if command -v npm >/dev/null 2>&1; then
+        local npm_version=$(npm --version)
+        echo -e "${GREEN}✅ v$npm_version${NC}"
+    else
+        echo -e "${RED}❌ 未安装${NC}"
+        return 1
+    fi
+
+    echo ""
+
+    # 创建路由器工作目录
+    local router_dir="$HOME/.claude-router"
+    echo -e "${CYAN}$(get_text "router.install_location")${NC}"
+    echo "------------------"
+    echo "位置: $router_dir"
+    echo ""
+
+    # 克隆或更新路由器
+    echo -e "${CYAN}$(get_text "router.clone_or_update")${NC}"
+    echo "------------------"
+
+    if [ -d "$router_dir" ]; then
+        echo -e "${YELLOW}$(get_text "router.directory_exists")${NC}"
+        echo -n "$(get_text "router.update_directory")${NC}"
+        read -r response
+        case "$response" in
+            [Yy]*)
+                echo "$(get_text "router.updating")..."
+                cd "$router_dir" && git pull
+                ;;
+            *)
+                echo "$(get_text "router.using_existing")${NC}"
+                ;;
+        esac
+    else
+        echo "$(get_text "router.cloning")..."
+        git clone https://github.com/musistudio/claude-code-router.git "$router_dir"
+    fi
+
+    echo ""
+
+    # 安装依赖
+    echo -e "${CYAN}$(get_text "router.installing_dependencies")${NC}"
+    echo "------------------"
+    cd "$router_dir"
+    npm install
+
+    echo ""
+
+    # 全局安装
+    echo -e "${CYAN}$(get_text "router.global_install")${NC}"
+    echo "------------------"
+    npm install -g .
+
+    echo ""
+
+    # 验证安装
+    echo -e "${CYAN}$(get_text "router.verifying_installation")${NC}"
+    echo "------------------"
+    if command -v claude-code-router >/dev/null 2>&1 || command -v ccr >/dev/null 2>&1; then
+        echo -e "${GREEN}✅ $(get_text "router.install_success")${NC}"
+        local router_version=$(ccr -v 2>/dev/null || claude-code-router --version 2>/dev/null || echo "未知")
+        echo "   $(get_text "router.version"): $router_version"
+        echo ""
+        echo -e "${GREEN}$(get_text "router.install_completed")${NC}"
+        echo -e "${CYAN}💡 $(get_text "router.next_steps")${NC}"
+        echo "   1. 配置API密钥: claude-switch set-key <provider> <key>"
+        echo "   2. 启动路由器: claude-switch start-router"
+        echo "   3. 检查状态: claude-switch router-status"
+    else
+        echo -e "${RED}❌ $(get_text "router.install_failed")${NC}"
+        return 1
+    fi
+}
+
+# 启动路由器
+start_router() {
+    echo -e "${BLUE}🔄 $(get_text "router.starting")${NC}"
+    echo "=================="
+    echo ""
+
+    # 检查路由器是否已安装 (支持 ccr 和 claude-code-router)
+    if ! command -v claude-code-router >/dev/null 2>&1 && ! command -v ccr >/dev/null 2>&1; then
+        echo -e "${RED}❌ $(get_text "router.not_installed")${NC}"
+        echo -e "${CYAN}💡 $(get_text "router.setup_hint")${NC}"
+        return 1
+    fi
+
+    # 使用 ccr 命令启动
+    echo "$(get_text "router.launching")..."
+    ccr start 2>&1
+
+    echo ""
+    echo -e "${GREEN}✅ $(get_text "router.start_success")${NC}"
+    echo ""
+    echo -e "${CYAN}$(get_text "router.service_info")${NC}"
+    echo "   $(get_text "router.endpoint"): http://localhost:3456/v1"
+    echo "   $(get_text "router.status_check"): claude-switch router-status"
+    echo ""
+    echo -e "${GREEN}🎉 $(get_text "router.start_completed")${NC}"
+}
+
+# 停止路由器
+stop_router() {
+    echo -e "${BLUE}⏹️ $(get_text "router.stopping")${NC}"
+    echo "=================="
+    echo ""
+
+    # 检查路由器是否已安装
+    if ! command -v claude-code-router >/dev/null 2>&1 && ! command -v ccr >/dev/null 2>&1; then
+        echo -e "${RED}❌ $(get_text "router.not_installed")${NC}"
+        return 1
+    fi
+
+    # 使用 ccr 命令停止
+    echo "$(get_text "router.sending_stop")${NC}..."
+    ccr stop 2>&1
+
+    echo ""
+    echo -e "${GREEN}✅ $(get_text "router.stop_success")${NC}"
+    echo ""
+    echo -e "${CYAN}$(get_text "router.stop_completed")${NC}"
 }
 
 # 健康检查
@@ -1778,6 +1941,15 @@ main() {
             ;;
         "router-status"|"router")
             check_router_status
+            ;;
+        "setup-router")
+            setup_router
+            ;;
+        "start-router")
+            start_router
+            ;;
+        "stop-router")
+            stop_router
             ;;
         "zh-ui"|"chinese"|"中文")
             switch_language_to "zh-CN"
