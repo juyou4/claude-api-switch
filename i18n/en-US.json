@@ -10,7 +10,10 @@
       "$0 [number]            # Switch using number (1=GLM, 2=Kimi2, 3=MiniMax)",
       "$0 list                # List all available configurations",
       "$0 status              # Display current configuration status",
+      "$0 validate            # Validate all configuration files",
       "$0 backup              # Manually backup current configuration",
+      "$0 set-key <name> <key> # Quick API key setup",
+      "$0 setup-keys          # Batch API key setup for all configs",
       "$0 help                # Display this help information"
     ],
     "aliases_title": "Quick Aliases (run install script first):",
@@ -132,7 +135,16 @@
       "no_template_files": "    No template files",
       "choice_range": "❌ Invalid choice, please enter a number between 1-{count}",
       "current_config_missing": "❌ Current Claude configuration file not found",
-      "create_config_first": "Please use Claude CLI once first to create configuration file"
+      "create_config_first": "Please use Claude CLI once first to create configuration file",
+      "set_key_no_config": "❌ Please provide configuration name and API key",
+      "set_key_usage": "Usage: $0 set-key <config_name> <api_key>",
+      "set_key_no_api_key": "❌ Please provide API key",
+      "set_key_invalid_format": "❌ Invalid API key format",
+      "set_key_backup_failed": "⚠️ Configuration backup failed, but continuing to set key",
+      "set_key_config_not_found": "❌ Configuration '{name}' not found",
+      "set_key_json_error": "❌ Configuration file JSON format error",
+      "set_key_write_failed": "❌ Failed to write API key",
+      "set_key_success": "✅ API key for configuration '{name}' has been updated"
     },
     "warnings": {
       "jq_required": "⚠️ jq required for complete validation",
@@ -164,6 +176,20 @@
       "edit_config_hint": "  Please edit configuration file to set your API key and other parameters"
     }
   },
+  "key_management": {
+    "title": "🔑 API Key Management",
+    "setup_title": "🔑 Batch API Key Setup",
+    "setup_intro": "Will help you set up API keys for each configuration one by one",
+    "skip_existing": "Configuration '{name}' already has a key, skipping (enter 'r' to reset)",
+    "input_key_prompt": "Please enter API key for '{name}': ",
+    "confirm_key": "Confirm setting key: {key_preview}... (y/n/r/q)",
+    "setting_key": "Setting key for '{name}'...",
+    "all_done": "✅ API keys setup completed for all configurations!",
+    "no_configs": "❌ No configurations found that need API keys",
+    "operation_cancelled": "Operation cancelled",
+    "invalid_response": "Invalid response, please enter y/n/r/q",
+    "setup_summary": "Successfully set: {success}/{total} configurations"
+  },
   "create_wizard": {
     "title": "🔧 Interactive Configuration Creation Wizard",
     "input_error": "❌ Input timeout or cannot read input, exiting...",
@@ -183,5 +209,30 @@
   "language": {
     "title": "Available Language Configurations:",
     "switching": "Language Switch"
+  },
+  "validate": {
+    "title": "🔍 Configuration Validation Report",
+    "summary_title": "Validation Summary",
+    "total_configs": "Total configs",
+    "valid_configs": "Valid configs",
+    "warning_configs": "Warning configs",
+    "invalid_configs": "Invalid configs",
+    "all_valid": "All configurations are valid!",
+    "found_warnings": "Found some warnings, please check configurations",
+    "found_issues": "Found issues, please fix configurations"
+  },
+  "health": {
+    "title": "🏥 System Health Check",
+    "system_check": "1. System Check",
+    "config_check": "2. Configuration Check",
+    "api_check": "3. API Check",
+    "permissions_check": "4. Permissions Check",
+    "config_not_found": "❌ Configuration '{name}' not found",
+    "summary_title": "Health Check Summary",
+    "status": {
+      "healthy": "System is healthy!",
+      "warning": "Found some warnings",
+      "critical": "Found critical issues"
+    }
   }
 }

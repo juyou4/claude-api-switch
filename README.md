@@ -139,6 +139,9 @@ claude-switch en-ui            # 切换到英文界面
 # 显示当前配置状态
 claude-switch status
 
+# 验证所有配置完整性
+claude-switch validate            # 验证所有配置文件的格式和完整性
+
 # 密钥管理
 claude-switch set-key glm "your-api-key-here"    # 快速设置GLM的API密钥
 claude-switch set-key deepseek "your-api-key-here" # 快速设置DeepSeek的API密钥
@@ -196,6 +199,32 @@ claude-switch glm
 - ✅ 配置文件结构验证
 - ✅ 必要字段完整性检查
 
+### 健康检查和诊断
+
+全面的系统健康状况检查，帮助诊断配置问题：
+
+```bash
+# 完整健康检查
+claude-switch health              # 检查当前配置的健康状况
+claude-switch hc                  # 使用别名
+
+# 详细健康检查（包含API连接测试）
+claude-switch health --verbose    # 包含API连接测试
+claude-switch health -v           # 简短形式
+
+# 检查特定配置
+claude-switch health glm          # 检查GLM配置
+```
+
+**检查项目**：
+- 🔧 系统工具检查（jq、curl等）
+- 📁 配置目录权限检查
+- 📄 配置文件格式验证
+- 🔑 API密钥格式检查
+- 🌐 API端点配置检查
+- 🤖 模型配置验证
+- 🔗 API连接性测试（仅详细模式）
+
 ### 自动备份保护
 
 重要操作前自动创建备份：
@@ -236,6 +265,10 @@ cscreate              # 启动交互式配置创建向导
 cssave <名称>         # 保存当前配置为新配置
 csdelete <名称>       # 删除指定配置（需要确认）
 csbackup              # 备份当前配置
+csvalidate            # 验证所有配置文件的完整性
+csv                   # 验证配置的快捷别名
+cshealth              # 健康检查
+cshc                  # 健康检查的快捷别名
 ```
 
 **示例用法**：
@@ -684,7 +717,15 @@ rm -rf ~/.claude/configs/
 
 ## 📝 更新日志
 
-### v2.1.0 (最新)
+### v2.2.0 (最新)
+- ✨ **新增validate命令** - 批量验证所有配置文件的完整性和格式
+- ✨ **新增health命令** - 全面的系统健康检查和诊断功能
+- 🔍 **增强配置验证** - 智能检测配置问题并提供详细报告
+- 🏥 **新增健康检查** - 系统工具、权限、API配置、连接性全面检查
+- 🛡️ **优化错误诊断** - 提供可操作的修复建议和解决方案
+- 📊 **详细统计报告** - 验证和健康检查的详细统计信息
+
+### v2.1.0
 - ✨ **新增set-key命令** - 快速设置单个API密钥，支持格式验证和自动备份
 - ✨ **新增setup-keys命令** - 交互式批量设置所有配置的API密钥向导
 - 🔐 **增强密钥安全验证** - 密钥格式检查、自动备份和错误恢复机制

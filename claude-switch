@@ -4,8 +4,9 @@
 # A concise API provider switching tool designed for developers
 # Supports: GLM, Kimi2, MiniMax, etc.
 
-# Version: 2.1.0
+# Version: 2.2.0
 # Multi-language Support Enhanced
+# Features: Configuration validation and health check
 
 # Load multi-language system
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -139,6 +140,268 @@ validate_api_connectivity() {
     fi
 }
 
+# 验证所有配置文件
+validate_all_configs() {
+    echo -e "${BLUE}$(get_text "validate.title")${NC}"
+    echo "=================="
+    echo ""
+
+    local total=0
+    local valid=0
+    local invalid=0
+    local warnings=0
+
+    # 遍历所有配置文件
+    for config in "$CONFIG_DIR"/*.json; do
+        if [ -f "$config" ]; then
+            ((total++))
+            local name=$(basename "$config" .json)
+
+            # 跳过语言界面配置
+            case "$name" in
+                zh-ui|en-ui|test-*|*.tmp|*.backup*)
+                    continue
+                    ;;
+            esac
+
+            echo -n "检查 $name... "
+
+            # JSON格式验证
+            if ! validate_json "$config"; then
+                echo -e "${RED}❌ JSON格式错误${NC}"
+                ((invalid++))
+                continue
+            fi
+
+            # 配置完整性验证
+            if validate_config_completeness "$config" >/dev/null 2>&1; then
+                echo -e "${GREEN}✅ 通过${NC}"
+                ((valid++))
+            else
+                echo -e "${YELLOW}⚠️ 有警告${NC}"
+                ((warnings++))
+            fi
+        fi
+    done
+
+    echo ""
+    echo "=================="
+    echo -e "${BLUE}$(get_text "validate.summary_title")${NC}"
+    echo "=================="
+    echo "$(get_text "validate.total_configs"): $total"
+    echo -e "$(get_text "validate.valid_configs"): ${GREEN}$valid${NC}"
+    echo -e "$(get_text "validate.warning_configs"): ${YELLOW}$warnings${NC}"
+    echo -e "$(get_text "validate.invalid_configs"): ${RED}$invalid${NC}"
+    echo ""
+
+    # 显示总结信息
+    if [ $invalid -eq 0 ] && [ $warnings -eq 0 ]; then
+        echo -e "${GREEN}✅ $(get_text "validate.all_valid")${NC}"
+    elif [ $invalid -eq 0 ]; then
+        echo -e "${YELLOW}⚠️ $(get_text "validate.found_warnings")${NC}"
+    else
+        echo -e "${RED}❌ $(get_text "validate.found_issues")${NC}"
+    fi
+}
+
+# 验证API密钥格式
+validate_api_key_format() {
+    local api_key="$1"
+
+    # 基础长度验证
+    if [[ ${#api_key} -lt 20 ]]; then
+        return 1
+    fi
+
+    # 检查是否只包含字母、数字和常见符号
+    if [[ ! "$api_key" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+        return 1
+    fi
+
+    return 0
+}
+
+# 检查权限
+check_permissions() {
+    local issues=0
+
+    # 检查配置目录权限
+    if [ ! -d "$CONFIG_DIR" ]; then
+        echo -e "${RED}❌ 配置目录不存在: $CONFIG_DIR${NC}"
+        ((issues++))
+    elif [ ! -r "$CONFIG_DIR" ]; then
+        echo -e "${RED}❌ 配置目录不可读: $CONFIG_DIR${NC}"
+        ((issues++))
+    elif [ ! -w "$CONFIG_DIR" ]; then
+        echo -e "${YELLOW}⚠️ 配置目录不可写: $CONFIG_DIR${NC}"
+        ((issues++))
+    fi
+
+    # 检查活动配置文件权限
+    if [ -f "$CLAUDE_CONFIG" ]; then
+        if [ ! -r "$CLAUDE_CONFIG" ]; then
+            echo -e "${RED}❌ 配置文件不可读: $CLAUDE_CONFIG${NC}"
+            ((issues++))
+        elif [ ! -w "$CLAUDE_CONFIG" ]; then
+            echo -e "${YELLOW}⚠️ 配置文件不可写: $CLAUDE_CONFIG${NC}"
+            ((issues++))
+        fi
+    fi
+
+    # 检查备份目录权限
+    if [ ! -d "$BACKUP_DIR" ]; then
+        echo -e "${YELLOW}⚠️ 备份目录不存在，将创建${NC}"
+        mkdir -p "$BACKUP_DIR" 2>/dev/null
+    elif [ ! -w "$BACKUP_DIR" ]; then
+        echo -e "${YELLOW}⚠️ 备份目录不可写: $BACKUP_DIR${NC}"
+        ((issues++))
+    fi
+
+    return $issues
+}
+
+# 健康检查
+health_check() {
+    local config_name="${1:-$(get_current_config)}"
+    local verbose="${2:-false}"
+
+    echo -e "${BLUE}🏥 $(get_text "health.title")${NC}"
+    echo "=================="
+    echo ""
+
+    local total_issues=0
+    local total_warnings=0
+
+    # 1. 系统检查
+    echo -e "${CYAN}$(get_text "health.system_check")${NC}"
+    echo "------------------"
+
+    # 检查必要工具
+    echo -n "检查必要工具 (jq)... "
+    if command -v jq >/dev/null 2>&1; then
+        echo -e "${GREEN}✅${NC}"
+    else
+        echo -e "${YELLOW}⚠️ 未安装${NC}"
+        ((total_warnings++))
+    fi
+
+    echo -n "检查必要工具 (curl)... "
+    if command -v curl >/dev/null 2>&1; then
+        echo -e "${GREEN}✅${NC}"
+    else
+        echo -e "${YELLOW}⚠️ 未安装${NC}"
+        ((total_warnings++))
+    fi
+
+    echo -n "检查配置目录权限... "
+    if check_permissions; then
+        echo -e "${GREEN}✅${NC}"
+    else
+        echo -e "${YELLOW}⚠️ 发现权限问题${NC}"
+        ((total_issues++))
+    fi
+
+    echo ""
+
+    # 2. 配置检查
+    echo -e "${CYAN}$(get_text "health.config_check")${NC}"
+    echo "------------------"
+
+    local config_file="$CONFIG_DIR/$config_name.json"
+    if [ ! -f "$config_file" ]; then
+        echo -e "${RED}❌ $(format_text "health.config_not_found" "name" "$config_name")${NC}"
+        ((total_issues++))
+    else
+        # 验证JSON格式
+        echo -n "JSON格式验证... "
+        if validate_json "$config_file"; then
+            echo -e "${GREEN}✅${NC}"
+        else
+            echo -e "${RED}❌ 失败${NC}"
+            ((total_issues++))
+        fi
+
+        # 验证配置完整性
+        echo -n "配置完整性验证... "
+        if validate_config_completeness "$config_file" >/dev/null 2>&1; then
+            echo -e "${GREEN}✅${NC}"
+        else
+            echo -e "${YELLOW}⚠️ 有警告${NC}"
+            ((total_warnings++))
+        fi
+    fi
+
+    echo ""
+
+    # 3. API检查
+    if [ -f "$config_file" ] && command -v jq >/dev/null 2>&1; then
+        echo -e "${CYAN}$(get_text "health.api_check")${NC}"
+        echo "------------------"
+
+        # 检查API密钥
+        local auth_token=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // ""' "$config_file")
+        echo -n "API密钥检查... "
+        if [ -z "$auth_token" ] || [ "$auth_token" = "your-api-key-here" ]; then
+            echo -e "${RED}❌ 未配置${NC}"
+            ((total_issues++))
+        elif ! validate_api_key_format "$auth_token"; then
+            echo -e "${YELLOW}⚠️ 格式可能无效${NC}"
+            ((total_warnings++))
+        else
+            echo -e "${GREEN}✅${NC}"
+        fi
+
+        # 检查API端点
+        local base_url=$(jq -r '.env.ANTHROPIC_BASE_URL // ""' "$config_file")
+        echo -n "API端点检查... "
+        if [ -z "$base_url" ]; then
+            echo -e "${RED}❌ 未配置${NC}"
+            ((total_issues++))
+        else
+            echo -e "${GREEN}✅ $base_url${NC}"
+        fi
+
+        # 检查模型配置
+        local model=$(jq -r '.env.ANTHROPIC_DEFAULT_SONNET_MODEL // ""' "$config_file")
+        echo -n "模型配置检查... "
+        if [ -z "$model" ]; then
+            echo -e "${RED}❌ 未配置${NC}"
+            ((total_issues++))
+        else
+            echo -e "${GREEN}✅ $model${NC}"
+        fi
+
+        # 检查API连接（仅在详细模式下）
+        if [ "$verbose" = "true" ] && [ -n "$base_url" ] && command -v curl >/dev/null 2>&1; then
+            echo ""
+            echo -n "API连接测试... "
+            if curl -s --connect-timeout 5 -I "$base_url" >/dev/null 2>&1; then
+                echo -e "${GREEN}✅ 可达${NC}"
+            else
+                echo -e "${YELLOW}⚠️ 不可达${NC}"
+                ((total_warnings++))
+            fi
+        fi
+    fi
+
+    echo ""
+    echo "=================="
+    echo -e "${BLUE}$(get_text "health.summary_title")${NC}"
+    echo "=================="
+    echo -e "严重问题: ${RED}$total_issues${NC}"
+    echo -e "警告: ${YELLOW}$total_warnings${NC}"
+    echo ""
+
+    # 显示总结信息
+    if [ $total_issues -eq 0 ] && [ $total_warnings -eq 0 ]; then
+        echo -e "${GREEN}✅ $(get_text "health.status.healthy")${NC}"
+    elif [ $total_issues -eq 0 ]; then
+        echo -e "${YELLOW}⚠️ $(get_text "health.status.warning")${NC}"
+    else
+        echo -e "${RED}❌ $(get_text "health.status.critical")${NC}"
+    fi
+}
+
 # 显示帮助信息
 show_help() {
     echo -e "${BLUE}$(get_text "app.title")${NC}"
@@ -230,6 +493,227 @@ format_text_line() {
     fi
 
     echo "$line"
+}
+
+# 设置API密钥
+set_key_config() {
+    local config_name="$1"
+    local api_key="$2"
+
+    # 参数验证
+    if [ -z "$config_name" ] || [ -z "$api_key" ]; then
+        if [ -z "$config_name" ]; then
+            echo -e "${RED}$(get_text "messages.errors.set_key_no_config")${NC}"
+        else
+            echo -e "${RED}$(get_text "messages.errors.set_key_no_api_key")${NC}"
+        fi
+        echo "$(format_text "messages.errors.set_key_usage" "0" "$0")"
+        return 1
+    fi
+
+    ensure_dirs
+
+    # 查找配置文件
+    local config_file="$CONFIG_DIR/$config_name.json"
+    if [ ! -f "$config_file" ]; then
+        echo -e "${RED}$(format_text "messages.errors.set_key_config_not_found" "name" "$config_name")${NC}"
+        return 1
+    fi
+
+    # 验证JSON格式
+    if ! validate_json "$config_file"; then
+        echo -e "${RED}$(get_text "messages.errors.set_key_json_error")${NC}"
+        return 1
+    fi
+
+    # 基础密钥格式验证
+    if [[ ${#api_key} -lt 20 ]]; then
+        echo -e "${RED}$(get_text "messages.errors.set_key_invalid_format")${NC}"
+        return 1
+    fi
+
+    # 创建备份
+    local backup_file="$config_file.backup.$(date +%Y%m%d_%H%M%S)"
+    if ! cp "$config_file" "$backup_file" 2>/dev/null; then
+        echo -e "${YELLOW}$(get_text "messages.errors.set_key_backup_failed")${NC}"
+    else
+        echo -e "${CYAN}$(format_text "status.config_backed_up" "path" "$backup_file")${NC}"
+    fi
+
+    # 使用jq更新API密钥
+    if command -v jq >/dev/null 2>&1; then
+        if jq --arg api_key "$api_key" '.env.ANTHROPIC_AUTH_TOKEN = $api_key' "$config_file" > "$config_file.tmp" && mv "$config_file.tmp" "$config_file"; then
+            echo -e "${GREEN}$(format_text "messages.errors.set_key_success" "name" "$config_name")${NC}"
+            return 0
+        else
+            echo -e "${RED}$(get_text "messages.errors.set_key_write_failed")${NC}"
+            # 尝试恢复备份
+            if [ -f "$backup_file" ]; then
+                mv "$backup_file" "$config_file"
+            fi
+            return 1
+        fi
+    else
+        # 如果没有jq，使用sed作为后备方案
+        if sed -i "s/\"ANTHROPIC_AUTH_TOKEN\":[[:space:]]*\"[^\"]*\"/\"ANTHROPIC_AUTH_TOKEN\": \"$api_key\"/" "$config_file"; then
+            echo -e "${GREEN}$(format_text "messages.errors.set_key_success" "name" "$config_name")${NC}"
+            echo -e "${YELLOW}$(get_text "messages.warnings.jq_required")${NC}"
+            return 0
+        else
+            echo -e "${RED}$(get_text "messages.errors.set_key_write_failed")${NC}"
+            # 尝试恢复备份
+            if [ -f "$backup_file" ]; then
+                mv "$backup_file" "$config_file"
+            fi
+            return 1
+        fi
+    fi
+}
+
+# 交互式批量设置API密钥
+setup_keys_interactive() {
+    echo -e "${BLUE}$(get_text "key_management.setup_title")${NC}"
+    echo "$(get_text "key_management.setup_intro")"
+    echo ""
+
+    # 获取所有需要设置密钥的配置
+    local configs_needing_key=()
+    for config_file in "$CONFIG_DIR"/*.json; do
+        if [ -f "$config_file" ]; then
+            local config_name=$(basename "$config_file" .json)
+            # 跳过语言配置
+            case "$config_name" in
+                zh-ui|en-ui|*.tmp|*.backup*)
+                    continue
+                    ;;
+            esac
+
+            # 检查是否已有API密钥
+            if command -v jq >/dev/null 2>&1; then
+                local current_key=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // ""' "$config_file" 2>/dev/null)
+                if [[ -z "$current_key" || "$current_key" == "your-api-key-here" || "$current_key" == "sk-" ]]; then
+                    configs_needing_key+=("$config_name")
+                fi
+            else
+                # 如果没有jq，将所有配置都加入
+                configs_needing_key+=("$config_name")
+            fi
+        fi
+    done
+
+    if [ ${#configs_needing_key[@]} -eq 0 ]; then
+        echo -e "${GREEN}$(get_text "key_management.no_configs")${NC}"
+        return 0
+    fi
+
+    local success_count=0
+    local total_count=${#configs_needing_key[@]}
+
+    for config_name in "${configs_needing_key[@]}"; do
+        echo ""
+        echo -e "${CYAN}$(format_text "key_management.setting_key" "name" "$config_name")${NC}"
+
+        # 检查当前密钥状态
+        local config_file="$CONFIG_DIR/$config_name.json"
+        local current_key=""
+        if command -v jq >/dev/null 2>&1; then
+            current_key=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // ""' "$config_file" 2>/dev/null)
+        fi
+
+        if [[ -n "$current_key" && "$current_key" != "your-api-key-here" && "$current_key" != "sk-" ]]; then
+            echo "$(format_text "key_management.skip_existing" "name" "$config_name")"
+            echo -n "重新设置？ (y/n): "
+            read -r response
+            case "$response" in
+                [Yy]*)
+                    # 继续
+                    ;;
+                *)
+                    echo "跳过 $config_name"
+                    continue
+                    ;;
+            esac
+        fi
+
+        # 输入API密钥
+        local api_key=""
+        while [[ -z "$api_key" ]]; do
+            echo -n "$(format_text "key_management.input_key_prompt" "name" "$config_name")"
+            read -s api_key
+            echo ""
+
+            if [[ -z "$api_key" ]]; then
+                echo -e "${RED}API密钥不能为空，请重新输入${NC}"
+                continue
+            fi
+
+            if [[ ${#api_key} -lt 20 ]]; then
+                echo -e "${RED}API密钥格式可能无效，确定要继续吗？ (y/n): ${NC}"
+                read -r confirm
+                case "$confirm" in
+                    [Yy]*)
+                        # 继续
+                        ;;
+                    *)
+                        api_key=""
+                        continue
+                        ;;
+                esac
+            fi
+        done
+
+        # 确认设置
+        local key_preview="${api_key:0:10}"
+        echo -n "$(format_text "key_management.confirm_key" "key_preview" "$key_preview")"
+        read -r confirm
+        case "$confirm" in
+            [Yy]*)
+                if set_key_config "$config_name" "$api_key"; then
+                    ((success_count++))
+                    echo -e "${GREEN}✅ $config_name 密钥设置成功${NC}"
+                else
+                    echo -e "${RED}❌ $config_name 密钥设置失败${NC}"
+                fi
+                ;;
+            [Nn]*)
+                echo "已取消设置 $config_name"
+                continue
+                ;;
+            [Rr]*)
+                # 重新输入
+                    api_key=""
+                    while [[ -z "$api_key" ]]; do
+                        echo -n "$(format_text "key_management.input_key_prompt" "name" "$config_name")"
+                        read -s api_key
+                        echo ""
+
+                        if [[ -z "$api_key" ]]; then
+                            echo -e "${RED}API密钥不能为空，请重新输入${NC}"
+                            continue
+                        fi
+                    done
+
+                    if set_key_config "$config_name" "$api_key"; then
+                        ((success_count++))
+                        echo -e "${GREEN}✅ $config_name 密钥设置成功${NC}"
+                    else
+                        echo -e "${RED}❌ $config_name 密钥设置失败${NC}"
+                    fi
+                ;;
+            [Qq]*)
+                echo "$(get_text "key_management.operation_cancelled")"
+                break
+                ;;
+            *)
+                echo "$(get_text "key_management.invalid_response")"
+                continue
+                ;;
+        esac
+    done
+
+    echo ""
+    echo -e "${GREEN}$(get_text "key_management.all_done")${NC}"
+    echo "$(format_text "key_management.setup_summary" "success" "$success_count" "total" "$total_count")"
 }
 
 # 获取当前配置信息
@@ -1183,6 +1667,28 @@ main() {
             ;;
         "backup")
             backup_config
+            ;;
+        "validate"|"val"|"check")
+            validate_all_configs
+            ;;
+        "health"|"hc"|"check-health")
+            # 支持参数：--verbose 或 -v
+            local verbose="false"
+            local config_name="${2:-}"
+
+            # 检查是否为verbose参数
+            if [[ "$config_name" == "--verbose" || "$config_name" == "-v" ]]; then
+                verbose="true"
+                config_name=""
+            fi
+
+            health_check "$config_name" "$verbose"
+            ;;
+        "set-key")
+            set_key_config "$2" "$3"
+            ;;
+        "setup-keys")
+            setup_keys_interactive
             ;;
         "zh-ui"|"chinese"|"中文")
             switch_language_to "zh-CN"

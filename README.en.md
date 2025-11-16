@@ -142,6 +142,9 @@ claude-switch en-ui            # Switch to English interface
 # Display current configuration status
 claude-switch status
 
+# Validate all configuration integrity
+claude-switch validate            # Validate all configuration files' format and completeness
+
 # Key Management
 claude-switch set-key glm "your-api-key-here"    # Quick setup GLM API key
 claude-switch set-key deepseek "your-api-key-here" # Quick setup DeepSeek API key
@@ -199,6 +202,32 @@ Automatically validate configuration completeness and correctness:
 - ✅ Configuration file structure validation
 - ✅ Required field completeness checking
 
+### Health Check and Diagnostics
+
+Comprehensive system health check to help diagnose configuration issues:
+
+```bash
+# Full health check
+claude-switch health              # Check current configuration health status
+claude-switch hc                  # Use alias
+
+# Detailed health check (includes API connectivity test)
+claude-switch health --verbose    # Include API connectivity test
+claude-switch health -v           # Short form
+
+# Check specific configuration
+claude-switch health glm          # Check GLM configuration
+```
+
+**Check Items**:
+- 🔧 System tools check (jq, curl, etc.)
+- 📁 Configuration directory permissions check
+- 📄 Configuration file format validation
+- 🔑 API key format check
+- 🌐 API endpoint configuration check
+- 🤖 Model configuration validation
+- 🔗 API connectivity test (verbose mode only)
+
 ### Auto Backup Protection
 
 Automatically create backups before important operations:
@@ -239,6 +268,10 @@ cscreate              # Launch interactive configuration creation wizard
 cssave <name>         # Save current configuration as new configuration
 csdelete <name>       # Delete specified configuration (requires confirmation)
 csbackup              # Backup current configuration
+csvalidate            # Validate all configuration files' completeness
+csv                   # Quick alias for validate configuration
+cshealth              # Health check
+cshc                  # Quick alias for health check
 ```
 
 **Example Usage**:
@@ -687,7 +720,15 @@ rm -rf ~/.claude/configs/
 
 ## 📝 Changelog
 
-### v2.1.0 (Latest)
+### v2.2.0 (Latest)
+- ✨ **New validate Command** - Batch validation of all configuration files' completeness and format
+- ✨ **New health Command** - Comprehensive system health check and diagnostics
+- 🔍 **Enhanced Configuration Validation** - Smart detection of configuration issues with detailed reports
+- 🏥 **New Health Check** - System tools, permissions, API configuration, and connectivity comprehensive check
+- 🛡️ **Optimized Error Diagnosis** - Provides actionable fix suggestions and solutions
+- 📊 **Detailed Statistics Report** - Detailed statistical information for validation and health checks
+
+### v2.1.0
 - ✨ **New set-key Command** - Quick setup of individual API keys with format validation and automatic backup
 - ✨ **New setup-keys Command** - Interactive batch setup wizard for all configurations' API keys
 - 🔐 **Enhanced Key Security Validation** - Key format checking, automatic backup and error recovery mechanisms
