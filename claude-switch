@@ -4,9 +4,9 @@
 # A concise API provider switching tool designed for developers
 # Supports: GLM, Kimi2, MiniMax, etc.
 
-# Version: 2.2.0
+# Version: 2.3.0
 # Multi-language Support Enhanced
-# Features: Configuration validation and health check
+# Features: Configuration validation, health check, and router integration
 
 # Load multi-language system
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -258,6 +258,92 @@ check_permissions() {
     fi
 
     return $issues
+}
+
+# 检查路由器状态
+check_router_status() {
+    echo -e "${BLUE}🔀 $(get_text "router.status_title")${NC}"
+    echo "=================="
+    echo ""
+
+    local router_installed=false
+    local router_running=false
+    local router_port=3456
+
+    # 检查路由器是否安装
+    if command -v claude-code-router >/dev/null 2>&1; then
+        router_installed=true
+        echo -e "${GREEN}✅ $(get_text "router.installed")${NC}"
+    else
+        echo -e "${RED}❌ $(get_text "router.not_installed")${NC}"
+    fi
+
+    # 检查路由器是否运行
+    if [ "$router_installed" = true ]; then
+        echo -n "$(get_text "router.checking_running")... "
+        if command -v nc >/dev/null 2>&1; then
+            if nc -z localhost "$router_port" 2>/dev/null; then
+                router_running=true
+                echo -e "${GREEN}✅ $(get_text "router.running")${NC}"
+            else
+                echo -e "${YELLOW}⚠️ $(get_text "router.not_running")${NC}"
+            fi
+        elif command -v curl >/dev/null 2>&1; then
+            if curl -s --connect-timeout 2 "http://localhost:$router_port/health" >/dev/null 2>&1; then
+                router_running=true
+                echo -e "${GREEN}✅ $(get_text "router.running")${NC}"
+            else
+                echo -e "${YELLOW}⚠️ $(get_text "router.not_running")${NC}"
+            fi
+        else
+            echo -e "${YELLOW}⚠️ $(get_text "router.cannot_check")${NC}"
+        fi
+    fi
+
+    echo ""
+    echo "$(get_text "router.config_title"):"
+    echo "------------------"
+
+    # 检查路由器配置
+    local router_configs=0
+    for config in "$CONFIG_DIR"/*-router.json; do
+        if [ -f "$config" ]; then
+            ((router_configs++))
+            local name=$(basename "$config" .json)
+            local requires_router=$(jq -r '.requires_router // false' "$config" 2>/dev/null)
+            if [ "$requires_router" = "true" ]; then
+                echo -e "  ${GREEN}$name${NC}"
+                if command -v jq >/dev/null 2>&1; then
+                    local display_name=$(jq -r '.display_name // "未知"' "$config")
+                    local thinking=$(jq -r '.thinking_enabled // false' "$config")
+                    echo "    $display_name"
+                    if [ "$thinking" = "true" ]; then
+                        echo -e "    ${CYAN}🧠 $(get_text "router.thinking_enabled")${NC}"
+                    fi
+                fi
+            fi
+        fi
+    done
+
+    if [ $router_configs -eq 0 ]; then
+        echo -e "  ${YELLOW}$(get_text "router.no_configs")${NC}"
+    fi
+
+    echo ""
+    echo "=================="
+    echo -e "${BLUE}$(get_text "router.summary_title")${NC}"
+    echo "=================="
+
+    if [ "$router_installed" = true ] && [ "$router_running" = true ]; then
+        echo -e "${GREEN}✅ $(get_text "router.status.ready")${NC}"
+        echo -e "${CYAN}💡 $(get_text "router.ready_hint")${NC}"
+    elif [ "$router_installed" = true ]; then
+        echo -e "${YELLOW}⚠️ $(get_text "router.status.installed_not_running")${NC}"
+        echo -e "${CYAN}💡 $(get_text "router.start_hint")${NC}"
+    else
+        echo -e "${RED}❌ $(get_text "router.status.not_installed")${NC}"
+        echo -e "${CYAN}💡 $(get_text "router.setup_hint")${NC}"
+    fi
 }
 
 # 健康检查
@@ -1689,6 +1775,9 @@ main() {
             ;;
         "setup-keys")
             setup_keys_interactive
+            ;;
+        "router-status"|"router")
+            check_router_status
             ;;
         "zh-ui"|"chinese"|"中文")
             switch_language_to "zh-CN"

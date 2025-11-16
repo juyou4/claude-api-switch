@@ -234,5 +234,26 @@
       "warning": "Found some warnings",
       "critical": "Found critical issues"
     }
+  },
+  "router": {
+    "status_title": "🔀 Router Status Check",
+    "installed": "Router is installed",
+    "not_installed": "Router is not installed",
+    "checking_running": "Checking running status",
+    "running": "Running",
+    "not_running": "Not running",
+    "cannot_check": "Cannot check running status",
+    "config_title": "Router Configurations",
+    "thinking_enabled": "Thinking mode enabled",
+    "no_configs": "No router configurations found",
+    "summary_title": "Router Status Summary",
+    "status": {
+      "ready": "Router is ready!",
+      "installed_not_running": "Router installed but not running",
+      "not_installed": "Router not installed"
+    },
+    "ready_hint": "You can use router configs (e.g., glm-router)",
+    "start_hint": "Use 'start-router' command to start the router",
+    "setup_hint": "Use 'setup-router' command to install the router"
   }
 }

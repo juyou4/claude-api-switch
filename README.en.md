@@ -67,6 +67,9 @@ A concise, efficient Claude CLI API configuration switching tool designed for re
 - 🔐 **Smart Key Management** - Quick setup and batch management of API keys
 - 🛡️ **Key Security Validation** - Format validation and automatic backup protection
 - 🌐 **Multilingual Interaction** - Complete Chinese and English interactive wizards
+- 🧠 **Router Integration** - Enable thinking capability via claude-code-router
+- 🔀 **Local Routing Service** - Support for localhost:3456 routing middleware
+- ⚡ **Thinking Mode** - Enable reasoning via router middleware request format transformation
 
 ## 🏗️ Project Structure
 
@@ -144,6 +147,9 @@ claude-switch status
 
 # Validate all configuration integrity
 claude-switch validate            # Validate all configuration files' format and completeness
+
+# Router status check
+claude-switch router-status        # Check router installation and running status
 
 # Key Management
 claude-switch set-key glm "your-api-key-here"    # Quick setup GLM API key
@@ -447,7 +453,53 @@ claude-switch backup
 - **Configuration File**: `configs/anthropic-official.json`
 - **Features**: Official API, highest quality guarantee
 
-### 12. UI Language Configurations
+### 12. Router Thinking Mode Configurations
+
+#### What is Router Mode?
+Router mode integrates with [claude-code-router](https://github.com/musistudio/claude-code-router) project to run a local routing service that forwards API requests to actual providers while adding the `enable_thinking: true` parameter, thereby enabling the model's reasoning and thinking capabilities.
+
+#### Available Router Configurations
+- **GLM Router** (`glm-router.json`)
+  - **API Endpoint**: `http://localhost:3456/v1`
+  - **Models**: glm-4.6-thinking, glm-4.5-air-thinking, glm-4-flash-thinking
+  - **Features**: Enable thinking capability via router, requires installing and starting router service first
+
+- **DeepSeek Router** (`deepseek-router.json`)
+  - **API Endpoint**: `http://localhost:3456/v1`
+  - **Models**: deepseek-reasoner, deepseek-chat-v3.1, deepseek-coder
+  - **Features**: Dedicated reasoning model, better for complex reasoning tasks
+
+- **MiniMax Router** (`minimax-router.json`)
+  - **API Endpoint**: `http://localhost:3456/v1`
+  - **Models**: minimax-m2-thinking, minimax-m1.5, minimax-m1-light
+  - **Features**: MiniMax M2 series thinking mode configuration
+
+#### Router Configuration Usage
+```bash
+# 1. Check router status
+claude-switch router-status
+
+# 2. Switch to router configurations
+claude-switch glm-router
+claude-switch deepseek-router
+claude-switch minimax-router
+
+# 3. View current configuration status
+claude-switch status
+```
+
+#### How Router Works
+1. **Configuration Points To**: Router configurations set `ANTHROPIC_BASE_URL` to `http://localhost:3456/v1`
+2. **Request Transformation**: Router receives requests and adds `enable_thinking: true` parameter
+3. **Forward Request**: Router forwards the transformed request to the actual API provider
+4. **Return Response**: Returns the provider's response to Claude CLI
+
+#### Notes
+- **⚠️ Router Not Running**: Switching to router config will fail if router is not started
+- **⚠️ Requires Installation**: Router needs separate installation and configuration, see [claude-code-router](https://github.com/musistudio/claude-code-router) project
+- **⚠️ Port Occupancy**: Router uses port 3456 by default, ensure this port is not occupied
+
+### 13. UI Language Configurations
 
 #### Chinese Interface (zh-ui)
 - **Configuration File**: `configs/zh-ui.json`
@@ -720,7 +772,15 @@ rm -rf ~/.claude/configs/
 
 ## 📝 Changelog
 
-### v2.2.0 (Latest)
+### v2.3.0 (Latest)
+- ✨ **New router-status Command** - Router installation and running status checking
+- ✨ **New Router Configuration Templates** - Thinking mode configs for GLM, DeepSeek, MiniMax
+- 🔀 **Router Integration** - Support enabling API thinking capability via claude-code-router
+- 🧠 **Thinking Mode Support** - Enable reasoning and reflection via router middleware request format transformation
+- 📡 **Local Routing Service** - Config points to localhost:3456 router service, router adds enable_thinking parameter
+- 🔧 **Seamless Switching** - Fully compatible with existing config system, switch to router mode via config name
+
+### v2.2.0
 - ✨ **New validate Command** - Batch validation of all configuration files' completeness and format
 - ✨ **New health Command** - Comprehensive system health check and diagnostics
 - 🔍 **Enhanced Configuration Validation** - Smart detection of configuration issues with detailed reports
