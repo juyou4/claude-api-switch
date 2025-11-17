@@ -98,6 +98,22 @@ install_configs() {
     fi
 }
 
+# 安装i18n多语言文件
+install_i18n() {
+    echo -e "${YELLOW}安装多语言文件...${NC}"
+
+    # 创建i18n目录
+    mkdir -p "$INSTALL_DIR/i18n"
+
+    # 复制i18n文件
+    if [ -d "$SCRIPT_DIR/i18n" ]; then
+        cp -r "$SCRIPT_DIR/i18n/"* "$INSTALL_DIR/i18n/"
+        echo -e "${GREEN}✅ 多语言文件安装完成${NC}"
+    else
+        echo -e "${YELLOW}⚠️ 多语言文件目录不存在，跳过${NC}"
+    fi
+}
+
 # 检测Shell类型
 detect_shell() {
     if [ -n "$ZSH_VERSION" ]; then
@@ -370,6 +386,7 @@ main() {
     create_directories
     install_script
     install_configs
+    install_i18n
     install_shell_integration
     create_desktop_entry
     verify_installation
