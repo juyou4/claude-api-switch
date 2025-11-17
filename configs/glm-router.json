@@ -13,7 +13,7 @@
   },
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "在此处输入您的GLM API密钥",
-    "ANTHROPIC_BASE_URL": "http://localhost:3456/v1",
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456",
     "API_TIMEOUT_MS": "6000000",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-4.6-thinking",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.6-thinking",

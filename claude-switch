@@ -481,7 +481,7 @@ start_router() {
     echo -e "${GREEN}✅ $(get_text "router.start_success")${NC}"
     echo ""
     echo -e "${CYAN}$(get_text "router.service_info")${NC}"
-    echo "   $(get_text "router.endpoint"): http://localhost:3456/v1"
+    echo "   $(get_text "router.endpoint"): http://127.0.0.1:3456"
     echo "   $(get_text "router.status_check"): claude-switch router-status"
     echo ""
     echo -e "${GREEN}🎉 $(get_text "router.start_completed")${NC}"
