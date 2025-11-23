@@ -453,47 +453,174 @@ claude-switch backup
 ### 12. 路由器思考模式配置
 
 #### 什么是路由器模式？
-路由器模式通过集成 [claude-code-router](https://github.com/musistudio/claude-code-router) 项目，在本地运行一个路由服务，将 API 请求转发给实际的提供商的同时，添加 `enable_thinking: true` 参数，从而启用模型的推理和思考能力。
+路由器模式通过集成 [claude-code-router](https://github.com/musistudio/claude-code-router) 项目，在本地运行一个路由服务，实现智能路由功能：
+- **智能路由**: 根据任务类型自动选择最适合的模型（默认/思考/长文本/后台任务）
+- **请求转换**: 自动添加 `enable_thinking: true` 等参数启用思考能力
+- **多提供商支持**: 统一管理多个API提供商和模型
+- **Transformer适配**: 自动转换不同API的请求/响应格式
 
 #### 可用的路由器配置
-- **GLM 路由器** (`glm-router.json`)
-  - **API端点**: `http://localhost:3456/v1`
-  - **模型**: glm-4.6-thinking, glm-4.5-air-thinking, glm-4-flash-thinking
-  - **特点**: 通过路由器启用思考能力，需要先安装和启动路由器服务
 
-- **DeepSeek 路由器** (`deepseek-router.json`)
-  - **API端点**: `http://localhost:3456/v1`
-  - **模型**: deepseek-reasoner, deepseek-chat-v3.1, deepseek-coder
-  - **特点**: 专门的推理模型，更适合复杂推理任务
+##### DeepSeek 路由器 (`deepseek-router.json`)
+- **智能路由规则**:
+  - 默认任务: `deepseek-chat-v3.1`
+  - 思考任务: `deepseek-reasoner` (启用推理模式)
+  - 后台任务: `deepseek-chat` (节省成本)
+  - 长文本: `deepseek-chat-v3.1`
+- **Transformer配置**: 自动处理reasoning、tooluse、enhancetool
+- **特点**: 专门的推理模型，适合复杂推理任务
 
-- **MiniMax 路由器** (`minimax-router.json`)
-  - **API端点**: `http://localhost:3456/v1`
-  - **模型**: minimax-m2-thinking, minimax-m1.5, minimax-m1-light
-  - **特点**: MiniMax M2 系列思考模式配置
+##### GLM 路由器 (`glm-router.json`)
+- **智能路由规则**:
+  - 默认任务: `glm-4-plus`
+  - 思考任务: `glm-4-plus` (启用推理模式)
+  - 后台任务: `glm-4-flash` (快速响应)
+  - 长文本: `glm-4-plus`
+- **Transformer配置**: 自动处理reasoning、tooluse
+- **特点**: 智谱AI全系列模型支持
 
-#### 路由器配置使用方法
+##### MiniMax 路由器 (`minimax-router.json`)
+- **智能路由规则**:
+  - 默认任务: `abab6.5s-chat`
+  - 思考任务: `abab6.5s-chat` (启用推理模式)
+  - 后台任务: `abab5.5s-chat`
+  - 长文本: `abab6.5g-chat`
+- **Transformer配置**: 自动处理reasoning、tooluse、enhancetool
+- **特点**: MiniMax全系列模型支持
+
+#### 完整使用流程
+
+##### 1. 安装路由器
 ```bash
-# 1. 检查路由器状态
-claude-switch router-status
+# 自动安装
+claude-switch setup-router
 
-# 2. 切换到路由器配置
-claude-switch glm-router
-claude-switch deepseek-router
-claude-switch minimax-router
-
-# 3. 查看当前配置状态
-claude-switch status
+# 或手动安装
+git clone https://github.com/musistudio/claude-code-router.git ~/.claude-router
+cd ~/.claude-router
+npm install
+npm install -g .
 ```
 
+##### 2. 配置API密钥
+```bash
+# 快速设置单个密钥
+claude-switch set-key deepseek-router "your-api-key-here"
+claude-switch set-key glm-router "your-api-key-here"
+
+# 或批量设置
+claude-switch setup-keys
+```
+
+##### 3. 切换到路由器配置
+```bash
+# 切换时会自动：
+# 1. 生成 ~/.claude-code-router/config.json
+# 2. 检查路由器安装状态
+# 3. 提示启动路由器（如未运行）
+claude-switch deepseek-router
+```
+
+##### 4. 启动路由器
+```bash
+# 启动路由器服务（会自动验证配置）
+claude-switch start-router
+
+# 查看路由器状态
+claude-switch router-status
+
+# 停止路由器
+claude-switch stop-router
+```
+
+##### 5. 激活环境变量（可选）
+```bash
+# 输出环境变量设置语句
+eval "$(claude-switch activate-router deepseek-router)"
+
+# 这会设置：
+# - ANTHROPIC_AUTH_TOKEN
+# - ANTHROPIC_BASE_URL=http://127.0.0.1:3456
+# - API_TIMEOUT_MS=6000000
+# - NO_PROXY, DISABLE_TELEMETRY等
+```
+
+#### 高级功能
+
+##### 动态模型切换
+在Claude Code对话中动态切换模型：
+```
+/model deepseek,deepseek-reasoner
+/model zhipu,glm-4-plus
+```
+
+##### 子代理模型指定
+为Task工具指定特定模型，在提示词开头添加：
+```
+<CCR-SUBAGENT-MODEL>deepseek,deepseek-reasoner</CCR-SUBAGENT-MODEL>
+请帮我分析这段代码...
+```
+
+##### 健康检查
+```bash
+# 完整健康检查（包含路由器配置检查）
+claude-switch health deepseek-router
+
+# 详细模式（包含API连接测试）
+claude-switch health deepseek-router --verbose
+```
+
+#### 配置文件结构
+
+路由器配置文件包含两层配置：
+
+1. **claude-switch配置** (`~/.claude/configs/deepseek-router.json`):
+```json
+{
+  "name": "deepseek-router",
+  "requires_router": true,
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "your-key",
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456"
+  },
+  "router_template": {
+    "Providers": [...],
+    "Router": {...}
+  }
+}
+```
+
+2. **claude-code-router配置** (`~/.claude-code-router/config.json`):
+   - 切换配置时自动生成
+   - 包含完整的Providers、Router、Transformer配置
+   - 替换${ANTHROPIC_AUTH_TOKEN}为实际密钥
+
 #### 路由器工作原理
-1. **配置指向**: 路由器配置将 `ANTHROPIC_BASE_URL` 指向 `http://localhost:3456/v1`
-2. **请求转换**: 路由器接收请求后，添加 `enable_thinking: true` 参数
-3. **转发请求**: 路由器将转换后的请求转发给实际的 API 提供商
-4. **返回响应**: 将提供商的响应返回给 Claude CLI
+
+```
+Claude CLI
+    ↓ (请求)
+    ↓ ANTHROPIC_BASE_URL=http://127.0.0.1:3456
+    ↓
+claude-code-router (本地路由服务)
+    ↓ (智能路由决策)
+    ↓ 根据任务类型选择模型
+    ↓ 应用Transformer转换
+    ↓ 添加enable_thinking等参数
+    ↓
+API Provider (DeepSeek/GLM/MiniMax)
+    ↓ (响应)
+    ↓
+claude-code-router (响应转换)
+    ↓
+Claude CLI (显示结果)
+```
 
 #### 注意事项
-- **⚠️ 路由器未运行**: 如果路由器未启动，切换到路由器配置会失败
-- **⚠️ 需要安装**: 路由器需要单独安装和配置，详见 [claude-code-router](https://github.com/musistudio/claude-code-router) 项目
+- **✅ 自动生成配置**: 切换到路由器配置时自动生成 `~/.claude-code-router/config.json`
+- **✅ 智能提示**: 如果路由器未运行，会提示并询问是否启动
+- **✅ 配置验证**: 启动前自动验证配置文件格式和内容
+- **⚠️ 需要jq工具**: 生成配置文件需要jq，请先安装
 - **⚠️ 端口占用**: 路由器默认占用 3456 端口，确保该端口未被占用
 
 ### 13. UI语言配置
