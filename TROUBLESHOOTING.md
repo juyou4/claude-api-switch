@@ -269,14 +269,14 @@ curl -X POST http://127.0.0.1:3456/v1/messages \
   "api_key": "your-api-key",
   "models": ["glm-4.6", "glm-4.5-air"],
   "transformer": {
-    "use": ["Anthropic"]
+    "use": []
   }
 }
 ```
 **优势**:
 - ✅ 原生支持 Anthropic API 格式
 - ✅ 支持 GLM-4.6 思考模式和推理能力
-- ✅ 无需额外 transformer 配置
+- ✅ 无需 transformer（端点已是 Anthropic 格式）
 - ✅ 模型名称直接使用版本号（glm-4.6）
 
 **替代配置：OpenAI兼容API（基础模式）**
