@@ -9,16 +9,18 @@
     "ANTHROPIC_AUTH_TOKEN": "在此处输入您的GLM API密钥",
     "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456",
     "API_TIMEOUT_MS": "6000000",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-4.6-thinking",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4.6-thinking",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4.5-air-thinking"
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-4-plus",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-4-plus",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-4-flashx"
   },
   "models": {
-    "glm-4.6-thinking": "思考模式 - 支持推理和反思",
-    "glm-4.5-air-thinking": "思考模式 - 轻量级推理",
-    "glm-4-flash-thinking": "思考模式 - 极速推理"
+    "glm-4-plus": "GLM-4.6 旗舰模型 - 代码能力对齐Claude Sonnet 4",
+    "glm-4-air-250414": "GLM-4 Air - 基础语言模型",
+    "glm-4-airx": "GLM-4 AirX - 高速版本",
+    "glm-4-flashx": "GLM-4 FlashX - 超快推理",
+    "glm-4-flash-250414": "GLM-4 Flash - 完全免费"
   },
-  "default_model": "glm-4.6-thinking",
+  "default_model": "glm-4-plus",
   "router_template": {
     "APIKEY": "",
     "PROXY_URL": "",
@@ -34,10 +36,10 @@
         "api_key": "${ANTHROPIC_AUTH_TOKEN}",
         "models": [
           "glm-4-plus",
-          "glm-4-0520",
-          "glm-4-air",
+          "glm-4-air-250414",
           "glm-4-airx",
-          "glm-4-flash"
+          "glm-4-flashx",
+          "glm-4-flash-250414"
         ],
         "transformer": {
           "use": []
@@ -46,7 +48,7 @@
     ],
     "Router": {
       "default": "zhipu,glm-4-plus",
-      "background": "zhipu,glm-4-flash",
+      "background": "zhipu,glm-4-flashx",
       "think": "zhipu,glm-4-plus",
       "longContext": "zhipu,glm-4-plus",
       "longContextThreshold": 60000,
