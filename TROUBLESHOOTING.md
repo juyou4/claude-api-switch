@@ -260,20 +260,45 @@ curl -X POST http://127.0.0.1:3456/v1/messages \
 ## API端点正确配置参考
 
 ### GLM (智谱AI)
+
+**推荐配置：Anthropic原生API（支持思考模式）**
+```json
+{
+  "name": "zhipu",
+  "api_base_url": "https://open.bigmodel.cn/api/anthropic",
+  "api_key": "your-api-key",
+  "models": ["glm-4.6", "glm-4.5-air"],
+  "transformer": {
+    "use": ["Anthropic"]
+  }
+}
+```
+**优势**:
+- ✅ 原生支持 Anthropic API 格式
+- ✅ 支持 GLM-4.6 思考模式和推理能力
+- ✅ 无需额外 transformer 配置
+- ✅ 模型名称直接使用版本号（glm-4.6）
+
+**替代配置：OpenAI兼容API（基础模式）**
 ```json
 {
   "name": "zhipu",
   "api_base_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
   "api_key": "your-api-key",
-  "models": ["glm-4-plus", "glm-4-0520", "glm-4-air", "glm-4-airx", "glm-4-flash"],
+  "models": ["glm-4-plus", "glm-4-air-250414", "glm-4-airx", "glm-4-flashx"],
   "transformer": {
     "use": []
   }
 }
 ```
-**注意**: API端点必须包含 `/chat/completions` 后缀
+**注意**:
+- 使用此端点时，模型名称为 `glm-4-plus`（GLM-4.6的API调用名）
+- 不支持思考模式（除非自定义 transformer）
 
-**参考**: [Issue #398](https://github.com/musistudio/claude-code-router/issues/398)
+**参考**:
+- [智谱AI Claude Code接入文档](https://docs.bigmodel.cn/cn/guide/develop/claude)
+- [GLM-4.6思考模式配置](https://github.com/musistudio/claude-code-router/blob/main/blog/zh/GLM-4.6%E6%94%AF%E6%8C%81%E6%80%9D%E8%80%83%E5%8F%8A%E6%80%9D%E7%BB%B4%E9%93%BE%E5%9B%9E%E4%BC%A0.md)
+- [Issue #398](https://github.com/musistudio/claude-code-router/issues/398)
 
 ### DeepSeek
 ```json
