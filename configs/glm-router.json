@@ -30,7 +30,7 @@
     "Providers": [
       {
         "name": "zhipu",
-        "api_base_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+        "api_base_url": "https://open.bigmodel.cn/api/paas/v4",
         "api_key": "${ANTHROPIC_AUTH_TOKEN}",
         "models": [
           "glm-4-plus",
