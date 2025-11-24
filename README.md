@@ -158,7 +158,12 @@ claude-switch create            # 启动交互式配置创建向导
 claude-switch save <名称>        # 保存当前配置为新配置
 claude-switch delete <名称>      # 删除指定配置
 claude-switch backup            # 备份当前配置
+
+# 路由器配置修复（如果遇到问题）
+./fix-router-config.sh          # 自动修复路由器配置问题
 ```
+
+> **💡 提示**: 如果路由器配置后Claude回答答非所问，请查看 [故障排除指南](TROUBLESHOOTING.md#问题1路由器配置后claude回答答非所问)
 
 ## 🎨 高级功能
 

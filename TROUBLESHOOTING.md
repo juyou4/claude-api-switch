@@ -1,0 +1,346 @@
+# 故障排除指南
+
+## 常见问题
+
+### 问题1：路由器配置后Claude回答答非所问
+
+**症状**：
+- 切换到路由器配置后，Claude的回答完全不对
+- 提问中文，回答英文
+- 回答内容与问题无关
+
+**原因**：
+生成的 `~/.claude-code-router/config.json` 文件中的API端点配置错误。
+
+**快速诊断**：
+```bash
+# 查看生成的配置文件
+cat ~/.claude-code-router/config.json | grep api_base_url
+
+# 错误示例（需要修复）：
+# "api_base_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"  ❌
+
+# 正确示例：
+# "api_base_url": "https://open.bigmodel.cn/api/paas/v4"  ✅
+```
+
+**解决方案**：
+
+#### 方法1：使用自动修复脚本（推荐）
+```bash
+cd ~/project/claude-api-switch
+chmod +x fix-router-config.sh
+./fix-router-config.sh
+```
+
+#### 方法2：手动修复
+```bash
+# 1. 停止路由器
+ccr stop
+
+# 2. 删除旧配置
+rm ~/.claude-code-router/config.json
+
+# 3. 重新切换配置（会自动生成新配置）
+claude-switch glm-router
+
+# 4. 启动路由器
+ccr start
+
+# 5. 验证配置
+cat ~/.claude-code-router/config.json | grep api_base_url
+```
+
+#### 方法3：直接编辑配置文件
+```bash
+# 1. 停止路由器
+ccr stop
+
+# 2. 编辑配置文件
+nano ~/.claude-code-router/config.json
+
+# 3. 找到并修改以下内容：
+
+# GLM配置：
+# 错误: "api_base_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+# 改为: "api_base_url": "https://open.bigmodel.cn/api/paas/v4",
+
+# DeepSeek配置：
+# 错误: "api_base_url": "https://api.deepseek.com/v1/chat/completions",
+# 改为: "api_base_url": "https://api.deepseek.com/chat/completions",
+
+# MiniMax配置：
+# 错误: "api_base_url": "https://api.minimaxi.com/v1/text/chatcompletion_v2",
+# 改为: "api_base_url": "https://api.minimaxi.com/anthropic",
+
+# 4. 保存并重启路由器
+ccr start
+```
+
+---
+
+### 问题2：切换配置后提示"路由器未安装"
+
+**症状**：
+```
+❌ claude-code-router 未安装
+💡 请先安装路由器:
+   claude-switch setup-router
+```
+
+**解决方案**：
+```bash
+# 检查是否已安装
+command -v ccr
+
+# 如果未安装，自动安装
+claude-switch setup-router
+
+# 或手动安装
+git clone https://github.com/musistudio/claude-code-router.git ~/.claude-router
+cd ~/.claude-router
+npm install
+npm install -g .
+
+# 验证安装
+ccr --version
+```
+
+---
+
+### 问题3：路由器启动失败
+
+**症状**：
+```
+❌ 路由器配置文件不存在
+💡 请先切换到路由器配置以生成配置文件
+```
+
+**解决方案**：
+```bash
+# 1. 确认API密钥已配置
+grep "ANTHROPIC_AUTH_TOKEN" ~/.claude/configs/glm-router.json
+
+# 如果是占位符，设置真实密钥
+claude-switch set-key glm-router "你的API密钥"
+
+# 2. 切换到路由器配置
+claude-switch glm-router
+
+# 3. 启动路由器
+claude-switch start-router
+```
+
+---
+
+### 问题4：端口3456被占用
+
+**症状**：
+```
+Error: listen EADDRINUSE: address already in use :::3456
+```
+
+**解决方案**：
+```bash
+# 检查占用端口的进程
+lsof -i :3456
+
+# 如果是旧的ccr进程，停止它
+ccr stop
+
+# 或强制杀死进程
+kill -9 $(lsof -t -i:3456)
+
+# 重新启动
+ccr start
+```
+
+---
+
+### 问题5：API密钥未配置
+
+**症状**：
+```
+❌ API密钥未配置，无法生成路由器配置
+```
+
+**解决方案**：
+```bash
+# 快速设置单个密钥
+claude-switch set-key glm-router "你的GLM-API密钥"
+claude-switch set-key deepseek-router "你的DeepSeek-API密钥"
+
+# 或使用交互式批量设置
+claude-switch setup-keys
+```
+
+---
+
+## 诊断工具
+
+### 完整诊断脚本
+```bash
+cat > /tmp/diagnose-router.sh << 'EOF'
+#!/bin/bash
+echo "=== Claude Router 完整诊断 ==="
+echo ""
+
+echo "1. 路由器安装检查:"
+command -v ccr && echo "✅ 已安装: $(ccr --version)" || echo "❌ 未安装"
+echo ""
+
+echo "2. 配置文件检查:"
+for config in glm-router deepseek-router minimax-router; do
+    if [ -f ~/.claude/configs/$config.json ]; then
+        echo "  ✅ $config.json 存在"
+    else
+        echo "  ❌ $config.json 不存在"
+    fi
+done
+echo ""
+
+echo "3. 路由器配置文件:"
+if [ -f ~/.claude-code-router/config.json ]; then
+    echo "  ✅ 存在"
+    echo "  API端点:"
+    cat ~/.claude-code-router/config.json | grep -A 1 "api_base_url" | head -2
+else
+    echo "  ❌ 不存在"
+fi
+echo ""
+
+echo "4. 路由器运行状态:"
+if nc -z localhost 3456 2>/dev/null; then
+    echo "  ✅ 运行中 (端口3456)"
+else
+    echo "  ❌ 未运行"
+fi
+echo ""
+
+echo "5. API密钥检查:"
+for config in glm-router deepseek-router minimax-router; do
+    if [ -f ~/.claude/configs/$config.json ]; then
+        KEY=$(grep "ANTHROPIC_AUTH_TOKEN" ~/.claude/configs/$config.json | head -1 | cut -d'"' -f4)
+        if [[ "$KEY" == "在此处输入"* || -z "$KEY" ]]; then
+            echo "  ❌ $config: 未配置"
+        else
+            echo "  ✅ $config: 已配置 (${KEY:0:20}...)"
+        fi
+    fi
+done
+echo ""
+
+echo "6. 当前Claude配置:"
+claude-switch status 2>/dev/null | grep -A 10 "当前配置"
+echo ""
+
+echo "=== 诊断完成 ==="
+EOF
+
+chmod +x /tmp/diagnose-router.sh
+/tmp/diagnose-router.sh
+```
+
+### 快速测试路由器
+```bash
+# 测试路由器是否正常响应
+curl -X POST http://127.0.0.1:3456/v1/messages \
+  -H "x-api-key: 你的API密钥" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "content-type: application/json" \
+  -d '{
+    "model": "glm-4-plus",
+    "messages": [{"role": "user", "content": "你好，请用中文回答"}],
+    "max_tokens": 100
+  }'
+
+# 应该返回类似：
+# {"id":"...","type":"message","role":"assistant","content":[{"type":"text","text":"你好！..."}],...}
+```
+
+---
+
+## API端点正确配置参考
+
+### GLM (智谱AI)
+```json
+{
+  "name": "zhipu",
+  "api_base_url": "https://open.bigmodel.cn/api/paas/v4",
+  "api_key": "your-api-key",
+  "models": ["glm-4-plus", "glm-4-0520", "glm-4-air", "glm-4-airx", "glm-4-flash"],
+  "transformer": {
+    "use": []
+  }
+}
+```
+
+**参考**: [Issue #398](https://github.com/musistudio/claude-code-router/issues/398)
+
+### DeepSeek
+```json
+{
+  "name": "deepseek",
+  "api_base_url": "https://api.deepseek.com/chat/completions",
+  "api_key": "your-api-key",
+  "models": ["deepseek-reasoner", "deepseek-chat"],
+  "transformer": {
+    "use": ["deepseek"],
+    "deepseek-chat": {
+      "use": ["tooluse"]
+    }
+  }
+}
+```
+
+**参考**: [DeepSeek Anthropic API文档](https://api-docs.deepseek.com/guides/anthropic_api)
+
+### MiniMax
+```json
+{
+  "name": "minimax",
+  "api_base_url": "https://api.minimaxi.com/anthropic",
+  "api_key": "your-api-key",
+  "models": ["MiniMax-M2"],
+  "transformer": {
+    "use": []
+  }
+}
+```
+
+**参考**: [MiniMax官方文档](https://platform.minimax.io/docs/guides/text-ai-coding-tools)
+
+---
+
+## 获取帮助
+
+如果以上方法都无法解决问题，请：
+
+1. **查看路由器日志**：
+   ```bash
+   ccr logs --follow
+   ```
+
+2. **运行完整诊断**：
+   ```bash
+   ./fix-router-config.sh
+   ```
+
+3. **查看健康检查**：
+   ```bash
+   claude-switch health glm-router --verbose
+   ```
+
+4. **提交Issue**：
+   - 项目地址：https://github.com/juyou4/claude-api-switch
+   - 包含诊断脚本输出
+   - 包含路由器日志
+
+---
+
+## 相关链接
+
+- [claude-code-router官方文档](https://github.com/musistudio/claude-code-router)
+- [GLM API文档](https://open.bigmodel.cn/dev/api)
+- [DeepSeek API文档](https://api-docs.deepseek.com/)
+- [MiniMax API文档](https://platform.minimax.io/docs)
