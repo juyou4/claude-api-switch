@@ -30,9 +30,18 @@ fi
 echo "📋 检查当前配置..."
 echo ""
 
-# 检查API端点是否有问题
-GLM_WRONG=$(grep -c "bigmodel.cn/api/paas/v4/chat/completions" "$ROUTER_CONFIG" 2>/dev/null || echo "0")
+# 检查API端点是否有问题（根据 issue #398 的正确配置）
+# GLM 必须包含 /chat/completions，缺少的是错误的
+GLM_WRONG=0
+if grep -q "bigmodel.cn/api/paas/v4\"" "$ROUTER_CONFIG" 2>/dev/null; then
+    # 找到了不包含 /chat/completions 的配置（缺少后缀）
+    GLM_WRONG=1
+fi
+
+# DeepSeek 不应包含 /v1/ 前缀
 DEEPSEEK_WRONG=$(grep -c "deepseek.com/v1/chat/completions" "$ROUTER_CONFIG" 2>/dev/null || echo "0")
+
+# MiniMax 不应该是旧的 v1/text/chatcompletion 端点
 MINIMAX_WRONG=$(grep -c "minimaxi.com/v1/text/chatcompletion" "$ROUTER_CONFIG" 2>/dev/null || echo "0")
 
 TOTAL_ISSUES=$((GLM_WRONG + DEEPSEEK_WRONG + MINIMAX_WRONG))
@@ -40,7 +49,8 @@ TOTAL_ISSUES=$((GLM_WRONG + DEEPSEEK_WRONG + MINIMAX_WRONG))
 if [ $TOTAL_ISSUES -eq 0 ]; then
     echo -e "${GREEN}✅ 配置文件正确，无需修复！${NC}"
     echo ""
-    cat "$ROUTER_CONFIG" | grep -A 1 "api_base_url"
+    echo "当前API端点配置："
+    cat "$ROUTER_CONFIG" | grep "api_base_url" | head -3
     exit 0
 fi
 
@@ -48,21 +58,22 @@ echo -e "${RED}❌ 发现 $TOTAL_ISSUES 个API端点错误！${NC}"
 echo ""
 
 if [ $GLM_WRONG -gt 0 ]; then
-    echo -e "${YELLOW}⚠️ GLM API端点错误：${NC}"
-    echo "   错误: https://open.bigmodel.cn/api/paas/v4/chat/completions"
-    echo "   正确: https://open.bigmodel.cn/api/paas/v4"
+    echo -e "${YELLOW}⚠️ GLM API端点缺少/chat/completions后缀：${NC}"
+    echo "   错误: https://open.bigmodel.cn/api/paas/v4"
+    echo "   正确: https://open.bigmodel.cn/api/paas/v4/chat/completions"
+    echo "   参考: https://github.com/musistudio/claude-code-router/issues/398"
     echo ""
 fi
 
 if [ $DEEPSEEK_WRONG -gt 0 ]; then
-    echo -e "${YELLOW}⚠️ DeepSeek API端点错误：${NC}"
+    echo -e "${YELLOW}⚠️ DeepSeek API端点包含不必要的/v1/前缀：${NC}"
     echo "   错误: https://api.deepseek.com/v1/chat/completions"
     echo "   正确: https://api.deepseek.com/chat/completions"
     echo ""
 fi
 
 if [ $MINIMAX_WRONG -gt 0 ]; then
-    echo -e "${YELLOW}⚠️ MiniMax API端点错误：${NC}"
+    echo -e "${YELLOW}⚠️ MiniMax API端点使用了旧的API格式：${NC}"
     echo "   错误: https://api.minimaxi.com/v1/text/chatcompletion*"
     echo "   正确: https://api.minimaxi.com/anthropic"
     echo ""
