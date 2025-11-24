@@ -17,11 +17,11 @@
 # 查看生成的配置文件
 cat ~/.claude-code-router/config.json | grep api_base_url
 
-# 错误示例（需要修复）：
-# "api_base_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"  ❌
+# GLM - 错误示例（需要修复）：
+# "api_base_url": "https://open.bigmodel.cn/api/paas/v4"  ❌ (缺少/chat/completions)
 
-# 正确示例：
-# "api_base_url": "https://open.bigmodel.cn/api/paas/v4"  ✅
+# GLM - 正确示例：
+# "api_base_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"  ✅
 ```
 
 **解决方案**：
@@ -59,19 +59,16 @@ ccr stop
 # 2. 编辑配置文件
 nano ~/.claude-code-router/config.json
 
-# 3. 找到并修改以下内容：
+# 3. 检查并修改API端点（如果需要）：
 
-# GLM配置：
-# 错误: "api_base_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
-# 改为: "api_base_url": "https://open.bigmodel.cn/api/paas/v4",
+# GLM配置（必须包含/chat/completions后缀）：
+# 正确: "api_base_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions"
 
-# DeepSeek配置：
-# 错误: "api_base_url": "https://api.deepseek.com/v1/chat/completions",
-# 改为: "api_base_url": "https://api.deepseek.com/chat/completions",
+# DeepSeek配置（完整路径，无/v1前缀）：
+# 正确: "api_base_url": "https://api.deepseek.com/chat/completions"
 
-# MiniMax配置：
-# 错误: "api_base_url": "https://api.minimaxi.com/v1/text/chatcompletion_v2",
-# 改为: "api_base_url": "https://api.minimaxi.com/anthropic",
+# MiniMax配置（Anthropic原生支持）：
+# 正确: "api_base_url": "https://api.minimaxi.com/anthropic"
 
 # 4. 保存并重启路由器
 ccr start
@@ -266,7 +263,7 @@ curl -X POST http://127.0.0.1:3456/v1/messages \
 ```json
 {
   "name": "zhipu",
-  "api_base_url": "https://open.bigmodel.cn/api/paas/v4",
+  "api_base_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
   "api_key": "your-api-key",
   "models": ["glm-4-plus", "glm-4-0520", "glm-4-air", "glm-4-airx", "glm-4-flash"],
   "transformer": {
@@ -274,6 +271,7 @@ curl -X POST http://127.0.0.1:3456/v1/messages \
   }
 }
 ```
+**注意**: API端点必须包含 `/chat/completions` 后缀
 
 **参考**: [Issue #398](https://github.com/musistudio/claude-code-router/issues/398)
 
