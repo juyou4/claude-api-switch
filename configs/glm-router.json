@@ -5,6 +5,7 @@
   "description": "使用智谱Anthropic原生API，支持GLM-4.6思考模式和推理能力",
   "requires_router": true,
   "thinking_enabled": true,
+  "alwaysThinkingEnabled": true,
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "在此处输入您的GLM API密钥",
     "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456",
