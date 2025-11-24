@@ -462,31 +462,33 @@ claude-switch backup
 #### 可用的路由器配置
 
 ##### DeepSeek 路由器 (`deepseek-router.json`)
+- **API端点**: `https://api.deepseek.com/chat/completions`
 - **智能路由规则**:
-  - 默认任务: `deepseek-chat-v3.1`
+  - 默认任务: `deepseek-chat`
   - 思考任务: `deepseek-reasoner` (启用推理模式)
   - 后台任务: `deepseek-chat` (节省成本)
-  - 长文本: `deepseek-chat-v3.1`
-- **Transformer配置**: 自动处理reasoning、tooluse、enhancetool
+  - 长文本: `deepseek-chat`
+- **Transformer配置**: 使用内置`deepseek` transformer + `tooluse`
 - **特点**: 专门的推理模型，适合复杂推理任务
 
 ##### GLM 路由器 (`glm-router.json`)
+- **API端点**: `https://open.bigmodel.cn/api/paas/v4`
 - **智能路由规则**:
   - 默认任务: `glm-4-plus`
   - 思考任务: `glm-4-plus` (启用推理模式)
   - 后台任务: `glm-4-flash` (快速响应)
   - 长文本: `glm-4-plus`
-- **Transformer配置**: 自动处理reasoning、tooluse
-- **特点**: 智谱AI全系列模型支持
+- **Transformer配置**: 空transformer（已兼容OpenAI格式）
+- **特点**: 智谱AI全系列模型支持，原生兼容
+- **参考**: [Issue #398](https://github.com/musistudio/claude-code-router/issues/398)
 
 ##### MiniMax 路由器 (`minimax-router.json`)
+- **API端点**: `https://api.minimaxi.com/anthropic`（中国）/ `https://api.minimax.io/anthropic`（国际）
 - **智能路由规则**:
-  - 默认任务: `abab6.5s-chat`
-  - 思考任务: `abab6.5s-chat` (启用推理模式)
-  - 后台任务: `abab5.5s-chat`
-  - 长文本: `abab6.5g-chat`
-- **Transformer配置**: 自动处理reasoning、tooluse、enhancetool
-- **特点**: MiniMax全系列模型支持
+  - 所有任务: `MiniMax-M2`（统一模型）
+- **Transformer配置**: 空transformer（原生支持Anthropic API）
+- **特点**: 直接支持Anthropic API格式，无需转换
+- **参考**: [官方文档](https://platform.minimax.io/docs/guides/text-ai-coding-tools)
 
 #### 完整使用流程
 

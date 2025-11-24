@@ -30,36 +30,28 @@
     "Providers": [
       {
         "name": "deepseek",
-        "api_base_url": "https://api.deepseek.com/v1/chat/completions",
+        "api_base_url": "https://api.deepseek.com/chat/completions",
         "api_key": "${ANTHROPIC_AUTH_TOKEN}",
         "models": [
           "deepseek-reasoner",
-          "deepseek-chat",
-          "deepseek-chat-v3.1",
-          "deepseek-coder"
+          "deepseek-chat"
         ],
         "transformer": {
           "use": ["deepseek"],
-          "deepseek-reasoner": {
-            "use": ["reasoning", "tooluse", "enhancetool"]
-          },
           "deepseek-chat": {
-            "use": ["tooluse"]
-          },
-          "deepseek-chat-v3.1": {
             "use": ["tooluse"]
           }
         }
       }
     ],
     "Router": {
-      "default": "deepseek,deepseek-chat-v3.1",
+      "default": "deepseek,deepseek-chat",
       "background": "deepseek,deepseek-chat",
       "think": "deepseek,deepseek-reasoner",
-      "longContext": "deepseek,deepseek-chat-v3.1",
+      "longContext": "deepseek,deepseek-chat",
       "longContextThreshold": 60000,
-      "webSearch": "deepseek,deepseek-chat-v3.1",
-      "image": "deepseek,deepseek-chat-v3.1"
+      "webSearch": "deepseek,deepseek-chat",
+      "image": "deepseek,deepseek-chat"
     }
   },
   "metadata": {

@@ -30,28 +30,24 @@
     "Providers": [
       {
         "name": "minimax",
-        "api_base_url": "https://api.minimaxi.com/v1/text/chatcompletion_v2",
+        "api_base_url": "https://api.minimaxi.com/anthropic",
         "api_key": "${ANTHROPIC_AUTH_TOKEN}",
         "models": [
-          "abab6.5s-chat",
-          "abab6.5g-chat",
-          "abab6.5t-chat",
-          "abab5.5s-chat",
-          "abab5.5-chat"
+          "MiniMax-M2"
         ],
         "transformer": {
-          "use": ["reasoning", "tooluse", "enhancetool"]
+          "use": []
         }
       }
     ],
     "Router": {
-      "default": "minimax,abab6.5s-chat",
-      "background": "minimax,abab5.5s-chat",
-      "think": "minimax,abab6.5s-chat",
-      "longContext": "minimax,abab6.5g-chat",
+      "default": "minimax,MiniMax-M2",
+      "background": "minimax,MiniMax-M2",
+      "think": "minimax,MiniMax-M2",
+      "longContext": "minimax,MiniMax-M2",
       "longContextThreshold": 60000,
-      "webSearch": "minimax,abab6.5s-chat",
-      "image": "minimax,abab6.5s-chat"
+      "webSearch": "minimax,MiniMax-M2",
+      "image": "minimax,MiniMax-M2"
     }
   },
   "metadata": {
