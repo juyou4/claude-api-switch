@@ -5,12 +5,6 @@
   "description": "通过本地路由器服务启用思考能力的GLM-4系列模型",
   "requires_router": true,
   "thinking_enabled": true,
-  "router_config": {
-    "provider": "zhipu",
-    "model": "glm-4.6-thinking",
-    "thinking_mode": true,
-    "base_endpoint": "https://open.bigmodel.cn/api/anthropic"
-  },
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "在此处输入您的GLM API密钥",
     "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456",
@@ -25,10 +19,45 @@
     "glm-4-flash-thinking": "思考模式 - 极速推理"
   },
   "default_model": "glm-4.6-thinking",
+  "router_template": {
+    "APIKEY": "",
+    "PROXY_URL": "",
+    "HOST": "127.0.0.1",
+    "PORT": 3456,
+    "LOG": true,
+    "LOG_LEVEL": "info",
+    "API_TIMEOUT_MS": 6000000,
+    "Providers": [
+      {
+        "name": "zhipu",
+        "api_base_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+        "api_key": "${ANTHROPIC_AUTH_TOKEN}",
+        "models": [
+          "glm-4-plus",
+          "glm-4-0520",
+          "glm-4-air",
+          "glm-4-airx",
+          "glm-4-flash"
+        ],
+        "transformer": {
+          "use": ["reasoning", "tooluse"]
+        }
+      }
+    ],
+    "Router": {
+      "default": "zhipu,glm-4-plus",
+      "background": "zhipu,glm-4-flash",
+      "think": "zhipu,glm-4-plus",
+      "longContext": "zhipu,glm-4-plus",
+      "longContextThreshold": 60000,
+      "webSearch": "zhipu,glm-4-plus",
+      "image": "zhipu,glm-4-plus"
+    }
+  },
   "metadata": {
     "created_at": "2024-01-01T00:00:00Z",
     "updated_at": "2024-01-01T00:00:00Z",
-    "version": "1.0",
+    "version": "2.0",
     "note": "需要运行 claude-code-router 服务"
   }
 }

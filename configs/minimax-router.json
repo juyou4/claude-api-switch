@@ -5,12 +5,6 @@
   "description": "通过本地路由器服务启用思考能力的MiniMax M2系列模型",
   "requires_router": true,
   "thinking_enabled": true,
-  "router_config": {
-    "provider": "minimax",
-    "model": "minimax-m2-thinking",
-    "thinking_mode": true,
-    "base_endpoint": "https://api.minimaxi.com/anthropic"
-  },
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "在此处输入您的MiniMax API密钥",
     "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456",
@@ -25,10 +19,45 @@
     "minimax-m1-light": "轻量模型 - 快速响应"
   },
   "default_model": "minimax-m2-thinking",
+  "router_template": {
+    "APIKEY": "",
+    "PROXY_URL": "",
+    "HOST": "127.0.0.1",
+    "PORT": 3456,
+    "LOG": true,
+    "LOG_LEVEL": "info",
+    "API_TIMEOUT_MS": 6000000,
+    "Providers": [
+      {
+        "name": "minimax",
+        "api_base_url": "https://api.minimaxi.com/v1/text/chatcompletion_v2",
+        "api_key": "${ANTHROPIC_AUTH_TOKEN}",
+        "models": [
+          "abab6.5s-chat",
+          "abab6.5g-chat",
+          "abab6.5t-chat",
+          "abab5.5s-chat",
+          "abab5.5-chat"
+        ],
+        "transformer": {
+          "use": ["reasoning", "tooluse", "enhancetool"]
+        }
+      }
+    ],
+    "Router": {
+      "default": "minimax,abab6.5s-chat",
+      "background": "minimax,abab5.5s-chat",
+      "think": "minimax,abab6.5s-chat",
+      "longContext": "minimax,abab6.5g-chat",
+      "longContextThreshold": 60000,
+      "webSearch": "minimax,abab6.5s-chat",
+      "image": "minimax,abab6.5s-chat"
+    }
+  },
   "metadata": {
     "created_at": "2024-01-01T00:00:00Z",
     "updated_at": "2024-01-01T00:00:00Z",
-    "version": "1.0",
+    "version": "2.0",
     "note": "需要运行 claude-code-router 服务"
   }
 }

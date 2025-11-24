@@ -5,12 +5,6 @@
   "description": "通过本地路由器服务启用思考能力的DeepSeek V3.1模型",
   "requires_router": true,
   "thinking_enabled": true,
-  "router_config": {
-    "provider": "deepseek",
-    "model": "deepseek-reasoner",
-    "thinking_mode": true,
-    "base_endpoint": "https://api.deepseek.com/anthropic"
-  },
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "在此处输入您的DeepSeek API密钥",
     "ANTHROPIC_BASE_URL": "http://127.0.0.1:3456",
@@ -25,10 +19,53 @@
     "deepseek-coder": "编程模型 - 代码生成"
   },
   "default_model": "deepseek-reasoner",
+  "router_template": {
+    "APIKEY": "",
+    "PROXY_URL": "",
+    "HOST": "127.0.0.1",
+    "PORT": 3456,
+    "LOG": true,
+    "LOG_LEVEL": "info",
+    "API_TIMEOUT_MS": 6000000,
+    "Providers": [
+      {
+        "name": "deepseek",
+        "api_base_url": "https://api.deepseek.com/v1/chat/completions",
+        "api_key": "${ANTHROPIC_AUTH_TOKEN}",
+        "models": [
+          "deepseek-reasoner",
+          "deepseek-chat",
+          "deepseek-chat-v3.1",
+          "deepseek-coder"
+        ],
+        "transformer": {
+          "use": ["deepseek"],
+          "deepseek-reasoner": {
+            "use": ["reasoning", "tooluse", "enhancetool"]
+          },
+          "deepseek-chat": {
+            "use": ["tooluse"]
+          },
+          "deepseek-chat-v3.1": {
+            "use": ["tooluse"]
+          }
+        }
+      }
+    ],
+    "Router": {
+      "default": "deepseek,deepseek-chat-v3.1",
+      "background": "deepseek,deepseek-chat",
+      "think": "deepseek,deepseek-reasoner",
+      "longContext": "deepseek,deepseek-chat-v3.1",
+      "longContextThreshold": 60000,
+      "webSearch": "deepseek,deepseek-chat-v3.1",
+      "image": "deepseek,deepseek-chat-v3.1"
+    }
+  },
   "metadata": {
     "created_at": "2024-01-01T00:00:00Z",
     "updated_at": "2024-01-01T00:00:00Z",
-    "version": "1.0",
+    "version": "2.0",
     "note": "需要运行 claude-code-router 服务"
   }
 }
